@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="head-name">
+        <p>RESTOSEHAT</p>
+    </div>
+
+    <div class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/stok">Stok</a></li>
+            <li><a href="/pengiriman">Pengiriman</a></li>
+            <li><a href="/order">Order</a></li>
+            <li><a href="/cabang">Cabang</a></li>
+            <li><a href="/bahan">Bahan</a></li>
+            <li><a href="/riwayat">Riwayat</a></li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <div class="head-content">
+            <p>Tabel Bahan</p>
+        </div>
+        <div class="main-content">
+            <a href="/tambah_bahan"><input type="button" value="Tambah Bahan"></a>
+            {% if items|length < 1 %}
+            <h4>Kosong</h4>
+            {% else %}
+            <table border="1" cellspacing="0">
+                <tr>
+                    <th>ID</th>
+                    <th>Nama</th>
+                    <th>Satuan</th>
+                    <th>Harga/Satuan</th>
+                    <th>Aksi</th>
+                </tr>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.namaBahan }}</td>
+                    <td>{{ item.satuan }}</td>
+                    <td>{{ item.hargaPerSatuan }}</td>
+                    <td>
+                        <a href="/delete_bahan/{{item.id}}">Delete</a>
+                        <br>
+                        <a href="/update/{{item.id}}">Update</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

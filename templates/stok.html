@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="head-name">
+        <p>RESTOSEHAT</p>
+    </div>
+
+    <div class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/stok">Stok</a></li>
+            <li><a href="/pengiriman">Pengiriman</a></li>
+            <li><a href="/order">Order</a></li>
+            <li><a href="/cabang">Cabang</a></li>
+            <li><a href="/bahan">Bahan</a></li>
+            <li><a href="/riwayat">Riwayat</a></li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <div class="head-content">
+            <p>Home Page</p>
+        </div>
+        <div class="main-content">
+            {% if stocks|length < 1 %}
+            <h4>Kosong</h4>
+            {% else %}
+            <table border="1" cellspacing="0">
+                <tr>
+                    <th>ID Cabang</th>
+                    <th>ID Bahan</th>
+                    <th>Nama Bahan</th>
+                    <th>Jmlh Bahan</th>
+                </tr>
+                {% for stock in stocks %}
+                <tr>
+                    <td>{{ stock.idCabang }}</td>
+                    <td>{{ stock.idBahan }}</td>
+                    <td>{{ stock.namaBahan }}</td>
+                    <td>{{ stock.jmlhBahan }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
