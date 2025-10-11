@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="content">
+    <h2>Order Berhasil!</h2>
+    <p>Bahan: {{bahan.namaBahan}}</p>
+    <p>Jumlah: {{jumlah}} {{bahan.satuan}}</p>
+    <p>Total Harga: Rp{{"{:,}".format(total)}}</p>
+    <a href="/stok">Lihat Stok</a>
+</div>
+{% endblock %}

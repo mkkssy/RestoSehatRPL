@@ -192,9 +192,46 @@ def pengiriman():
 
 @app.route("/order", methods=['POST', 'GET'])
 def order():
-    if request.method == 'POST':
-        
-    return render_template('order.html')
+    bahans = Bahan.query.order_by(Bahan.id).all()
+
+    if request.method == "POST":
+        selected_bahan_id = request.form["dropdownBahan"]
+        jumlah = int(request.form["jmlhBahan"])
+
+        bahan = Bahan.query.filter_by(id=selected_bahan_id).first()
+        if not bahan:
+            return "Error: bahan not found"
+
+        total_cost = bahan.hargaPerSatuan * jumlah
+
+        # Assuming 'CBG0001' = Cabang Pusat
+        pusat_cabang_id = "CBG0001"
+
+        stock_entry = Stock.query.filter_by(idCabang=pusat_cabang_id, idBahan=selected_bahan_id).first()
+
+        if stock_entry:
+            stock_entry.jmlhBahan += jumlah
+        else:
+            new_stock = Stock(
+                idCabang=pusat_cabang_id,
+                idBahan=selected_bahan_id,
+                namaBahan=bahan.namaBahan,
+                jmlhBahan=jumlah
+            )
+            db.session.add(new_stock)
+
+        db.session.commit()
+
+        return render_template(
+            "order_success.html",
+            bahan=bahan,
+            jumlah=jumlah,
+            total=total_cost
+        )
+
+    # GET: show the form
+    bahans = Bahan.query.order_by(Bahan.id).all()
+    return render_template("order.html", bahans=bahans)
     
 if __name__ == "__main__":
     app.run(debug=True)
