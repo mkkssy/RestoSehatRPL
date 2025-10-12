@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, Response
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import event, ForeignKey
 from datetime import datetime
+import csv
+from io import StringIO
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Stock.db'
@@ -328,6 +330,35 @@ def riwayat():
     cabangs = {c.id: c.namaCabang for c in Cabang.query.all()}
     bahans = {b.id: b.namaBahan for b in Bahan.query.all()}
     return render_template("riwayat.html", records=records, cabangs=cabangs, bahans=bahans)
+
+@app.route("/riwayat/export_csv")
+def export_riwayat_csv():
+    records = Riwayat.query.order_by(Riwayat.tanggal.desc()).all()
+    cabangs = {c.id: c.namaCabang for c in Cabang.query.all()}
+    bahans = {b.id: b.namaBahan for b in Bahan.query.all()}
+
+    # Create an in-memory string buffer
+    si = StringIO()
+    writer = csv.writer(si)
+
+    # Write CSV header
+    writer.writerow(["Tanggal", "Cabang", "Bahan", "Masuk", "Keluar"])
+
+    # Write each record
+    for r in records:
+        writer.writerow([
+            r.tanggal.strftime('%Y-%m-%d %H:%M:%S'),
+            cabangs.get(r.idCabang, 'Unknown'),
+            bahans.get(r.idBahan, 'Unknown'),
+            r.jmlhMasuk,
+            r.jmlhKeluar
+        ])
+
+    # Prepare the CSV as downloadable file
+    output = si.getvalue()
+    response = Response(output, mimetype="text/csv")
+    response.headers["Content-Disposition"] = "attachment; filename=riwayat.csv"
+    return response
     
 if __name__ == "__main__":
     app.run(debug=True)
