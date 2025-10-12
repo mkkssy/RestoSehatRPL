@@ -30,12 +30,12 @@
             <form action="/pengiriman" method="POST">
                 <select id="dropdownBahan" name="dropdownBahan">
                     {% for bahan in bahans %}
-                    <option value="{{bahan}}">{{bahan}}</option>
+                    <option value="{{bahan.id}}">{{bahan.namaBahan}}</option>
                     {% endfor %}
                 </select>
                 <select id="dropdownCabang" name="dropdownCabang">
                     {% for cabang in cabangs %}
-                    <option value="{{cabang}}">{{cabang}}</option>
+                    <option value="{{cabang.id}}">{{cabang.namaCabang}}</option>
                     {% endfor %}
                 </select>
                 <input type="text" placeholder="Jumlah" name="jmlhBahan">

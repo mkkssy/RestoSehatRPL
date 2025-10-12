@@ -26,6 +26,30 @@
         <div class="head-content">
             <p>Home Page</p>
         </div>
+        <div class="main-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Cabang</th>
+                        <th>Bahan</th>
+                        <th>Masuk</th>
+                        <th>Keluar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in records %}
+                    <tr>
+                        <td>{{ r.tanggal.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>{{ cabangs.get(r.idCabang, 'Unknown') }}</td>
+                        <td>{{ bahans.get(r.idBahan, 'Unknown') }}</td>
+                        <td>{{ r.jmlhMasuk }}</td>
+                        <td>{{ r.jmlhKeluar }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endblock %}

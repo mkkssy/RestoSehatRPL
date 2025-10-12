@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="head-name">
+        <p>RESTOSEHAT</p>
+    </div>
+
+    <div class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/stok">Stok</a></li>
+            <li><a href="/pengiriman">Pengiriman</a></li>
+            <li><a href="/order">Order</a></li>
+            <li><a href="/cabang">Cabang</a></li>
+            <li><a href="/bahan">Bahan</a></li>
+            <li><a href="/riwayat">Riwayat</a></li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <div class="head-content">
+            <p>Home Page</p>
+        </div>
+        <div class="main-content">
+            <form action="{{ url_for('update_stok', idCabang=cabang.id) }}" method="POST" style="text-align:center;">
+                <label for="idBahan">Pilih Bahan:</label>
+                <select name="idBahan" id="idBahan" required>
+                    {% for bahan in bahans %}
+                    <option value="{{ bahan.id }}">{{ bahan.namaBahan }}</option>
+                    {% endfor %}
+                </select>
+                <br><br>
+
+                <label for="jumlah">Jumlah:</label>
+                <input type="number" name="jumlah" id="jumlah" min="1" required>
+                <br><br>
+
+                <label for="tipe">Tipe:</label>
+                <select name="tipe" id="tipe" required>
+                    <option value="keluar">Keluar</option>
+                </select>
+                <br><br>
+
+                <button type="submit" class="btn">Update Stok</button>
+            </form>
+
+            <h2 style="text-align:center;">Stok Saat Ini</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Bahan</th>
+                        <th>Nama Bahan</th>
+                        <th>Jumlah</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stok in stok_list %}
+                    <tr>
+                        <td>{{ stok.idBahan }}</td>
+                        <td>{{ stok.namaBahan }}</td>
+                        <td>{{ stok.jmlhBahan }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>  
+</div>
+{% endblock %}

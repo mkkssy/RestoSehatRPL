@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import event, ForeignKey
 from datetime import datetime
@@ -6,6 +6,18 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Stock.db'
 db = SQLAlchemy(app)
+
+class Riwayat(db.Model):
+    idPrefix = 'RWT'
+    id = db.Column(db.String(5), primary_key=True)
+    idCabang = db.Column(db.String(5), db.ForeignKey('cabang.id'), nullable=False)
+    idBahan = db.Column(db.String(5), db.ForeignKey('bahan.id'), nullable=False)
+    tanggal = db.Column(db.DateTime, default=datetime.utcnow)
+    jmlhMasuk = db.Column(db.Integer, default=0)
+    jmlhKeluar = db.Column(db.Integer, default=0)
+
+    def __repr__ (self):
+        return f'<Riwayat {self.id}>'
 
 class Stock(db.Model):
     idPrefix = 'STK'
@@ -15,6 +27,9 @@ class Stock(db.Model):
     namaBahan = db.Column(db.String(200), nullable=False)
     jmlhBahan = db.Column(db.Integer, nullable=False)
 
+    def __repr__ (self):
+        return '<Stock %r>' % self.id
+
 class Bahan(db.Model):
     idPrefix = 'BHN'
     id = db.Column(db.String(5), primary_key=True)
@@ -22,19 +37,22 @@ class Bahan(db.Model):
     satuan = db.Column(db.String(8), nullable=False)
     hargaPerSatuan = db.Column(db.Integer, nullable=False)
     stocks = db.relationship('Stock', backref='bahan', lazy=True, cascade="all, delete-orphan")
+    riwayat = db.relationship('Riwayat', backref='bahan', lazy=True)
 
     def __repr__ (self):
-        return '<Bahan %r>' % self.idBahan
+        return '<Bahan %r>' % self.id
+    
     
 class Cabang(db.Model):
     idPrefix = 'CBG'
     id = db.Column(db.String(5), primary_key=True)
     namaCabang = db.Column(db.String(25), nullable=False)
     stocks = db.relationship('Stock', backref='cabang', lazy=True, cascade="all, delete-orphan")
+    riwayat = db.relationship('Riwayat', backref='cabang', lazy=True)
 
     def __repr__ (self):
-        return '<Cabang %r>' % self.idCabang
-    
+        return '<Cabang %r>' % self.id
+
 def generate_custom_id(model):
     prefix = getattr(model, 'idPrefix', '')
     last_entry = model.query.order_by(model.id.desc()).first()
@@ -161,38 +179,69 @@ def deleteCabang(id):
     
 @app.route("/pengiriman", methods=['POST', 'GET'])
 def pengiriman():
+    pusat_cabang_id = "CBG0001"
+    bahans = Bahan.query.order_by(Bahan.id).all()
+    cabangs = Cabang.query.filter(Cabang.id != pusat_cabang_id).all()
+
     if request.method == "POST":
-        selected_bahan = request.form["dropdownBahan"]
-        selected_cabang = request.form["dropdownCabang"]
+        selected_bahan_id = request.form["dropdownBahan"]
+        selected_cabang_id = request.form["dropdownCabang"]
         jumlah = int(request.form["jmlhBahan"])
 
-        stock_entry = Stock.query.filter_by(idCabang=selected_cabang, idBahan=selected_bahan).first()
+        # Get bahan and stock entries
+        bahan = Bahan.query.filter_by(id=selected_bahan_id).first()
+        if not bahan:
+            return "Error: bahan not found."
 
-        if stock_entry:
-            stock_entry.jmlhBahan += jumlah
+        pusat_stock = Stock.query.filter_by(idCabang=pusat_cabang_id, idBahan=selected_bahan_id).first()
+        target_stock = Stock.query.filter_by(idCabang=selected_cabang_id, idBahan=selected_bahan_id).first()
+
+        if not pusat_stock or pusat_stock.jmlhBahan < jumlah:
+            return "Error: Stok pusat tidak cukup."
+
+        # 🔹 Deduct from pusat
+        pusat_stock.jmlhBahan -= jumlah
+
+        # 🔹 Add to branch
+        if target_stock:
+            target_stock.jmlhBahan += jumlah
         else:
-            bahan = Bahan.query.filter_by(id=selected_bahan).first()
-            if not bahan:
-                return "Error: bahan not found."
-
-            new_stock = Stock(
-                idCabang=selected_cabang,
-                idBahan=selected_bahan,
+            target_stock = Stock(
+                idCabang=selected_cabang_id,
+                idBahan=selected_bahan_id,
                 namaBahan=bahan.namaBahan,
                 jmlhBahan=jumlah
             )
-            db.session.add(new_stock)
+            db.session.add(target_stock)
 
+        # 🔹 Record Riwayat for both pusat & cabang
+        riwayat_pusat = Riwayat(
+            idCabang=pusat_cabang_id,
+            idBahan=selected_bahan_id,
+            tanggal=datetime.now(),
+            jmlhMasuk=0,
+            jmlhKeluar=jumlah
+        )
+        riwayat_cabang = Riwayat(
+            idCabang=selected_cabang_id,
+            idBahan=selected_bahan_id,
+            tanggal=datetime.now(),
+            jmlhMasuk=jumlah,
+            jmlhKeluar=0
+        )
+        db.session.add(riwayat_pusat)
+        db.session.flush()
+        db.session.add(riwayat_cabang)
         db.session.commit()
+
         return redirect("/stok")
-    stocks = Stock.query.order_by(Stock.id).all()
-    dropdownCabang = {stock.idCabang for stock in stocks}
-    dropdownBahan = {stock.idBahan for stock in stocks}
-    return render_template('pengiriman.html', stocks = stocks, cabangs = dropdownCabang, bahans = dropdownBahan)
+
+    return render_template("pengiriman.html", bahans=bahans, cabangs=cabangs)
 
 @app.route("/order", methods=['POST', 'GET'])
 def order():
     bahans = Bahan.query.order_by(Bahan.id).all()
+    pusat_cabang_id = "CBG0001"  # Cabang pusat default
 
     if request.method == "POST":
         selected_bahan_id = request.form["dropdownBahan"]
@@ -204,22 +253,28 @@ def order():
 
         total_cost = bahan.hargaPerSatuan * jumlah
 
-        # Assuming 'CBG0001' = Cabang Pusat
-        pusat_cabang_id = "CBG0001"
-
         stock_entry = Stock.query.filter_by(idCabang=pusat_cabang_id, idBahan=selected_bahan_id).first()
 
         if stock_entry:
             stock_entry.jmlhBahan += jumlah
         else:
-            new_stock = Stock(
+            stock_entry = Stock(
                 idCabang=pusat_cabang_id,
                 idBahan=selected_bahan_id,
                 namaBahan=bahan.namaBahan,
                 jmlhBahan=jumlah
             )
-            db.session.add(new_stock)
+            db.session.add(stock_entry)
 
+        # 🔹 Record Riwayat (Masuk ke pusat)
+        riwayat = Riwayat(
+            idCabang=pusat_cabang_id,
+            idBahan=selected_bahan_id,
+            tanggal=datetime.now(),
+            jmlhMasuk=jumlah,
+            jmlhKeluar=0
+        )
+        db.session.add(riwayat)
         db.session.commit()
 
         return render_template(
@@ -229,9 +284,50 @@ def order():
             total=total_cost
         )
 
-    # GET: show the form
-    bahans = Bahan.query.order_by(Bahan.id).all()
     return render_template("order.html", bahans=bahans)
+
+@app.route("/update_stok/<string:idCabang>", methods=["POST", "GET"])
+def update_stok(idCabang):
+    cabang = Cabang.query.get_or_404(idCabang)
+    stok_list = Stock.query.filter_by(idCabang=idCabang).all()
+    bahans = Bahan.query.all()
+
+    if request.method == "POST":
+        idBahan = request.form["idBahan"]
+        jumlah_update = int(request.form["jumlah"])
+        tipe = request.form["tipe"]  # "keluar" only (since branch loses item)
+
+        stok = Stock.query.filter_by(idCabang=idCabang, idBahan=idBahan).first()
+        if not stok:
+            return "Error: stok bahan tidak ditemukan."
+
+        if tipe == "keluar":
+            if stok.jmlhBahan < jumlah_update:
+                return "Error: stok tidak cukup untuk dikurangi."
+            stok.jmlhBahan -= jumlah_update
+
+            # 🔹 Record Riwayat (Keluar dari cabang)
+            riwayat = Riwayat(
+                idCabang=idCabang,
+                idBahan=idBahan,
+                tanggal=datetime.now(),
+                jmlhMasuk=0,
+                jmlhKeluar=jumlah_update
+            )
+            db.session.add(riwayat)
+            db.session.commit()
+
+            return redirect(url_for("stok"))
+
+    return render_template("update_stok.html", cabang=cabang, stok_list=stok_list, bahans=bahans)
+
+@app.route("/riwayat", methods=["GET"])
+def riwayat():
+    # You can filter or sort if you want, e.g. by latest first
+    records = Riwayat.query.order_by(Riwayat.tanggal.desc()).all()
+    cabangs = {c.id: c.namaCabang for c in Cabang.query.all()}
+    bahans = {b.id: b.namaBahan for b in Bahan.query.all()}
+    return render_template("riwayat.html", records=records, cabangs=cabangs, bahans=bahans)
     
 if __name__ == "__main__":
     app.run(debug=True)
