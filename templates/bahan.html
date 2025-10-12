@@ -31,28 +31,34 @@
             {% if items|length < 1 %}
             <h4>Kosong</h4>
             {% else %}
-            <table border="1" cellspacing="0">
-                <tr>
-                    <th>ID</th>
-                    <th>Nama</th>
-                    <th>Satuan</th>
-                    <th>Harga/Satuan</th>
-                    <th>Aksi</th>
-                </tr>
-                {% for item in items %}
-                <tr>
-                    <td>{{ item.id }}</td>
-                    <td>{{ item.namaBahan }}</td>
-                    <td>{{ item.satuan }}</td>
-                    <td>{{ item.hargaPerSatuan }}</td>
-                    <td>
-                        <a href="/delete_bahan/{{item.id}}">Delete</a>
-                        <br>
-                        <a href="/update/{{item.id}}">Update</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
+            <div class="table-container">
+                <table border="1" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nama</th>
+                            <th>Satuan</th>
+                            <th>Harga/Satuan</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td>{{ item.id }}</td>
+                            <td>{{ item.namaBahan }}</td>
+                            <td>{{ item.satuan }}</td>
+                            <td>{{ item.hargaPerSatuan }}</td>
+                            <td>
+                                <a href="/delete_bahan/{{item.id}}">Delete</a>
+                                <br>
+                                <a href="/update/{{item.id}}">Update</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
             {% endif %}
         </div>
     </div>

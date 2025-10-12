@@ -30,31 +30,52 @@
             {% if stocks|length < 1 %}
             <h4>Kosong</h4>
             {% else %}
-            <table border="1" cellspacing="0">
-                <tr>
-                    <th>ID Cabang</th>
-                    <th>ID Bahan</th>
-                    <th>Nama Bahan</th>
-                    <th>Jmlh Bahan</th>
-                    <th>Aksi</th>
-                </tr>
-                {% for stock in stocks %}
-                <tr>
-                    <td>{{ stock.idCabang }}</td>
-                    <td>{{ stock.idBahan }}</td>
-                    <td>{{ stock.namaBahan }}</td>
-                    <td>{{ stock.jmlhBahan }}</td>
-                    <td>
-                        {% if stock.idCabang == 'CBG0001' %}
-                        <a href="/order">Update</a>
-                        {% else %}
-                        <a href="/update_stok/{{stock.idCabang}}">Update</a>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
+            <div class="filter">
+                <form method="get" action="{{ url_for('stok') }}">
+                    <label for="cabang">Filter by Cabang:</label>
+                    <select name="cabang" id="cabang">
+                        <option value="">All</option>
+                        {% for cabang in cabangs %}
+                            <option value="{{ cabang.id }}" {% if selected_cabang == cabang.id %}selected{% endif %}>
+                                {{ cabang.namaCabang }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <input type="submit" value="Filter">
+                </form>
+            </div>
 
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID Cabang</th>
+                            <th>ID Bahan</th>
+                            <th>Nama Bahan</th>
+                            <th>Jmlh Bahan</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stock in stocks %}
+                        <tr>
+                            <td>{{ stock.idCabang }}</td>
+                            <td>{{ stock.idBahan }}</td>
+                            <td>{{ stock.namaBahan }}</td>
+                            <td>{{ stock.jmlhBahan }}</td>
+                            <td>
+                                {% if stock.idCabang == 'CBG0001' %}
+                                <a href="/order">Update</a>
+                                {% else %}
+                                <a href="/update_stok/{{stock.idCabang}}">Update</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+                
             {% endif %}
         </div>
     </div>

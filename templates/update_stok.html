@@ -50,24 +50,26 @@
             </form>
 
             <h2 style="text-align:center;">Stok Saat Ini</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID Bahan</th>
-                        <th>Nama Bahan</th>
-                        <th>Jumlah</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for stok in stok_list %}
-                    <tr>
-                        <td>{{ stok.idBahan }}</td>
-                        <td>{{ stok.namaBahan }}</td>
-                        <td>{{ stok.jmlhBahan }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID Bahan</th>
+                            <th>Nama Bahan</th>
+                            <th>Jumlah</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stok in stok_list %}
+                        <tr>
+                            <td>{{ stok.idBahan }}</td>
+                            <td>{{ stok.namaBahan }}</td>
+                            <td>{{ stok.jmlhBahan }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>  
 </div>

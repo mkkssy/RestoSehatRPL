@@ -233,3 +233,62 @@ td a:hover {
         max-width: 90%;
     }
 }
+
+.table-container {
+    max-height: 400px; /* height of scrollable area */
+    overflow-y : hidden;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+/* Table styling */
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Sticky table header */
+.table-container thead {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.table-container thead th {
+    position: sticky;
+    top: 0;
+    background-color: #388e3c;
+    color: white;
+    z-index: 1;
+    text-align: left;
+    padding: 0.8rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/* Scrollable tbody */
+.table-container tbody {
+    display: block;
+    max-height: 400px; /* same as container */
+    overflow-y: auto;
+    width: 100%;
+}
+
+.table-container tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+/* Zebra stripes */
+.table-container tbody tr:nth-child(even) {
+    background-color: #f4f9f4;
+}
+
+.table-container tbody tr:hover {
+    background-color: #e8f5e9;
+}
+
+.table-container td {
+    padding: 0.8rem;
+    border-bottom: 1px solid #e0e0e0;
+}

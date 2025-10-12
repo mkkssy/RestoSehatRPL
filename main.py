@@ -77,9 +77,15 @@ def index():
 
 @app.route("/stok", methods=['POST', 'GET'])
 def stok():
-    stocks = Stock.query.order_by(Stock.idCabang).all()
-    cabangs = {stock.idCabang for stock in stocks}
-    return render_template('stok.html', stocks=stocks, cabangs=cabangs)
+    selected_cabang = request.args.get("cabang")  # get cabang filter from query string
+
+    if selected_cabang:
+        stocks = Stock.query.filter_by(idCabang=selected_cabang).order_by(Stock.idCabang).all()
+    else:
+        stocks = Stock.query.order_by(Stock.idCabang).all()
+
+    cabangs = Cabang.query.order_by(Cabang.id).all()  # list of Cabang objects for dropdown
+    return render_template('stok.html', stocks=stocks, cabangs=cabangs, selected_cabang=selected_cabang)
 
 @app.route("/tambah_bahan", methods=['POST', 'GET'])
 def tambahBahan():

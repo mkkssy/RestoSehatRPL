@@ -32,22 +32,26 @@
             <h4>Kosong</h4>
             {% else %}
             <table border="1" cellspacing="0">
-                <tr>
-                    <th>idCabang</th>
-                    <th>namaCabang</th>
-                    <th></th>
-                </tr>
-                {% for chain in chains %}
-                <tr>
-                    <td>{{ chain.id }}</td>
-                    <td>{{ chain.namaCabang }}</td>
-                    <td>
-                        <a href="/delete_cabang/{{chain.id}}">Delete</a>
-                        <br>
-                        <a href="/update/{{chain.id}}">Update</a>
-                    </td>
-                </tr>
-                {% endfor %}
+                <thead>
+                    <tr>
+                        <th>idCabang</th>
+                        <th>namaCabang</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for chain in chains %}
+                    <tr>
+                        <td>{{ chain.id }}</td>
+                        <td>{{ chain.namaCabang }}</td>
+                        <td>
+                            <a href="/delete_cabang/{{chain.id}}">Delete</a>
+                            <br>
+                            <a href="/update/{{chain.id}}">Update</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
             </table>
             {% endif %}
         </div>
