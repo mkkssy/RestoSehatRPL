@@ -34,7 +34,7 @@
                 <form method="get" action="{{ url_for('stok') }}">
                     <label for="cabang">Filter by Cabang:</label>
                     <select name="cabang" id="cabang">
-                        <option value="">All</option>
+                        <option value="">Semua</option>
                         {% for cabang in cabangs %}
                             <option value="{{ cabang.id }}" {% if selected_cabang == cabang.id %}selected{% endif %}>
                                 {{ cabang.namaCabang }}
@@ -61,7 +61,7 @@
                         <tr>
                             <td>{{ stock.idCabang }}</td>
                             <td>{{ stock.idBahan }}</td>
-                            <td>{{ stock.bahan.namaBahan }}</td>
+                            <td>{{ stock.namaBahan }}</td>
                             <td>{{ stock.jmlhBahan }}</td>
                             <td>
                                 {% if stock.idCabang == 'CBG0001' %}

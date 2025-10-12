@@ -15,12 +15,26 @@ body {
     font-size: 1.8rem;
     font-weight: 600;
     letter-spacing: 2px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3);
+    transition: background-color 0.3s ease-in-out;
+}
+
+/* Subtle hover for header (optional, adds liveliness) */
+.head-name:hover {
+    background-color: #357a38;
 }
 
 /* Navbar container */
 .navbar {
     background-color: #388e3c;
+    margin: 0.5rem auto;
+    width: 95%;
+    border-radius: 12px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
     padding: 0.5rem 0;
+    transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 /* Navbar list style */
@@ -38,12 +52,16 @@ body {
     text-decoration: none;
     color: white;
     font-weight: 500;
-    transition: 0.2s ease-in-out;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    transition: all 0.3s ease-in-out;
 }
 
 .navbar a:hover {
+    background-color: #2e7d32;
     color: #c8e6c9;
-    border-bottom: 2px solid #c8e6c9;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 6px rgba(46, 125, 50, 0.3);
 }
 
 /* Page content */
@@ -53,7 +71,7 @@ body {
     padding: 1rem 2rem;
     background-color: white;
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Section header */
@@ -73,6 +91,10 @@ body {
         flex-direction: column;
         align-items: center;
         gap: 1rem;
+    }
+
+    .navbar {
+        width: 90%;
     }
 }
 
@@ -106,7 +128,7 @@ table {
     border-collapse: collapse;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 /* Table header */
@@ -152,6 +174,7 @@ td a:hover {
     table {
         font-size: 0.9rem;
     }
+
     .navbar ul {
         flex-direction: column;
         align-items: center;
@@ -168,7 +191,7 @@ td a:hover {
     background-color: #f4f9f4;
     padding: 2rem;
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     width: 100%;
     max-width: 400px;
     margin: 0 auto;
@@ -226,6 +249,15 @@ td a:hover {
     background-color: #1b5e20;
 }
 
+.main-content input[type="number"] {
+    width: 100%;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid #c8e6c9;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: 0.2s ease-in-out;
+}
+
 /* Responsive form */
 @media (max-width: 600px) {
     .main-content form {
@@ -234,6 +266,7 @@ td a:hover {
     }
 }
 
+/* --- Scrollable table section --- */
 .table-container {
     max-height: 400px; /* height of scrollable area */
     border: 1px solid #e0e0e0;
@@ -292,12 +325,13 @@ td a:hover {
     border-bottom: 1px solid #e0e0e0;
 }
 
+/* Home intro */
 .home-intro {
     text-align: center;
     padding: 2rem;
     background-color: #f4f9f4;
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .home-intro h2 {
@@ -325,7 +359,7 @@ td a:hover {
     background-color: white;
     padding: 1.5rem;
     border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     flex: 1 1 150px;
     text-align: center;
 }

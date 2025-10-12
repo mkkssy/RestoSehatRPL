@@ -28,17 +28,21 @@
         </div>
         <div class="main-content">
             <form action="/pengiriman" method="POST">
+                <label for="dropdownBahan">Pilih Bahan:</label>
                 <select id="dropdownBahan" name="dropdownBahan">
                     {% for bahan in bahans %}
                     <option value="{{bahan.id}}">{{bahan.namaBahan}}</option>
                     {% endfor %}
                 </select>
+                <label for="dropdownCabang">Pilih Cabang:</label>
                 <select id="dropdownCabang" name="dropdownCabang">
                     {% for cabang in cabangs %}
                     <option value="{{cabang.id}}">{{cabang.namaCabang}}</option>
                     {% endfor %}
                 </select>
-                <input type="text" placeholder="Jumlah" name="jmlhBahan">
+                <label for="jmlhBahan">Pilih Jumlah:</label>
+                <input type="number" id="jmlhBahan" name="jmlhBahan" value="1" min="1">
+                <br>
                 <input type="submit" value="Submit">
             </form>
         </div>

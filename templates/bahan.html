@@ -27,12 +27,11 @@
             <p>Tabel Bahan</p>
         </div>
         <div class="main-content">
-            <a href="/tambah_bahan"><input type="button" value="Tambah Bahan"></a>
             {% if items|length < 1 %}
             <h4>Kosong</h4>
             {% else %}
             <div class="table-container">
-                <table border="1" cellspacing="0">
+                <table>
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -43,7 +42,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                    {% for item in items %}
+                        {% for item in items %}
                         <tr>
                             <td>{{ item.id }}</td>
                             <td>{{ item.namaBahan }}</td>
@@ -60,6 +59,8 @@
                 </table>
             </div>
             {% endif %}
+            <br><br>
+            <input type="submit" value="Tambah Bahan" onclick="window.location.href='/tambah_bahan'">
         </div>
     </div>
 </div>
