@@ -9,6 +9,8 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Stock.db'
 db = SQLAlchemy(app)
 
+# -- Model Database --
+
 class Riwayat(db.Model):
     idPrefix = 'RWT'
     id = db.Column(db.String(5), primary_key=True)
@@ -55,7 +57,7 @@ class Cabang(db.Model):
     def __repr__ (self):
         return '<Cabang %r>' % self.id
 
-def generate_custom_id(model):
+def generate_custom_id(model): # Method untuk membuat ID customized sesuai dengan prefix yang disediain dalam model database masing masing
     prefix = getattr(model, 'idPrefix', '')
     last_entry = model.query.order_by(model.id.desc()).first()
     if last_entry:
