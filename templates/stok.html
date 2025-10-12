@@ -36,6 +36,7 @@
                     <th>ID Bahan</th>
                     <th>Nama Bahan</th>
                     <th>Jmlh Bahan</th>
+                    <th>Aksi</th>
                 </tr>
                 {% for stock in stocks %}
                 <tr>
@@ -43,6 +44,7 @@
                     <td>{{ stock.idBahan }}</td>
                     <td>{{ stock.namaBahan }}</td>
                     <td>{{ stock.jmlhBahan }}</td>
+                    <td></td>
                 </tr>
                 {% endfor %}
             </table>
