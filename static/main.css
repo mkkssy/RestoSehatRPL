@@ -236,7 +236,6 @@ td a:hover {
 
 .table-container {
     max-height: 400px; /* height of scrollable area */
-    overflow-y : hidden;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
 }
@@ -268,7 +267,7 @@ td a:hover {
 /* Scrollable tbody */
 .table-container tbody {
     display: block;
-    max-height: 400px; /* same as container */
+    max-height: 350px; /* same as container */
     overflow-y: auto;
     width: 100%;
 }

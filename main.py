@@ -255,6 +255,10 @@ def order():
         selected_bahan_id = request.form["dropdownBahan"]
         jumlah = int(request.form["jmlhBahan"])
 
+        for s in Stock.query.filter_by(idCabang='CBG0001').all():
+            print(s.id, s.idBahan, repr(s.idBahan))
+            print(f"'{selected_bahan_id}'")
+
         bahan = Bahan.query.filter_by(id=selected_bahan_id).first()
         if not bahan:
             return "Error: bahan not found"
@@ -262,6 +266,8 @@ def order():
         total_cost = bahan.hargaPerSatuan * jumlah
 
         stock_entry = Stock.query.filter_by(idCabang=pusat_cabang_id, idBahan=selected_bahan_id).first()
+        print("Queried stock entry:", stock_entry)
+        print(f"'{bahan.id}'")
 
         if stock_entry:
             stock_entry.jmlhBahan += jumlah
@@ -273,6 +279,9 @@ def order():
                 jmlhBahan=jumlah
             )
             db.session.add(stock_entry)
+        
+        print("Selected bahan id:", repr(selected_bahan_id))
+        print("Existing stock entry:", stock_entry)
 
         # 🔹 Record Riwayat (Masuk ke pusat)
         riwayat = Riwayat(
