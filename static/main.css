@@ -292,3 +292,55 @@ td a:hover {
     padding: 0.8rem;
     border-bottom: 1px solid #e0e0e0;
 }
+
+.home-intro {
+    text-align: center;
+    padding: 2rem;
+    background-color: #f4f9f4;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.home-intro h2 {
+    color: #2e7d32;
+    margin-bottom: 1rem;
+}
+
+.home-intro p {
+    max-width: 700px;
+    margin: 0 auto;
+    color: #333;
+}
+
+/* Stats cards container */
+.stats-cards {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+/* Individual card */
+.stats-card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    flex: 1 1 150px;
+    text-align: center;
+}
+
+/* Stats number */
+.stats-card h2 {
+    color: #2e7d32;
+    font-size: 1.8rem;
+    margin: 0 0 0.5rem 0;
+}
+
+/* Stats label */
+.stats-card p {
+    margin: 0;
+    font-size: 1rem;
+    color: #333;
+}
