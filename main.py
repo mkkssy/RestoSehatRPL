@@ -338,6 +338,26 @@ def update_stok(idCabang):
 
     return render_template("update_stok.html", cabang=cabang, stok_list=stok_list, bahans=bahans)
 
+@app.route("/update_bahan/<string:id>", methods=['POST', 'GET'])
+def update_bahan(id):
+    bahan = Bahan.query.get_or_404(id)
+    if request.method == "POST":
+        bahan.namaBahan = request.form["namaBahan"]
+        bahan.satuan = request.form["satuan"]
+        bahan.hargaPerSatuan = int(request.form["hargaPerSatuan"])
+        db.session.commit()
+        return redirect("/bahan")
+    return render_template("update_bahan.html", bahan=bahan)
+
+@app.route("/update_cabang/<string:id>", methods=['POST', 'GET'])
+def update_cabang(id):
+    cabang = Cabang.query.get_or_404(id)
+    if request.method == "POST":
+        cabang.namaCabang = request.form["namaCabang"]
+        db.session.commit()
+        return redirect("/cabang")
+    return render_template("update_cabang.html", cabang=cabang)
+
 @app.route("/riwayat", methods=["GET"])
 def riwayat():
     # You can filter or sort if you want, e.g. by latest first
