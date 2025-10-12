@@ -1,7 +1,235 @@
-head{
+body {
     margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f9fafb;
+    color: #333;
 }
-body{
+
+/* Header with title */
+.head-name {
+    background-color: #2e7d32; /* green header */
+    color: white;
+    text-align: center;
+    padding: 1rem 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+/* Navbar container */
+.navbar {
+    background-color: #388e3c;
+    padding: 0.5rem 0;
+}
+
+/* Navbar list style */
+.navbar ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
     margin: 0;
-    font-family: sans-serif;
+    padding: 0;
+}
+
+/* Navbar links */
+.navbar a {
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    transition: 0.2s ease-in-out;
+}
+
+.navbar a:hover {
+    color: #c8e6c9;
+    border-bottom: 2px solid #c8e6c9;
+}
+
+/* Page content */
+.content {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 1rem 2rem;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Section header */
+.head-content {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2e7d32;
+    border-bottom: 2px solid #c8e6c9;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .navbar ul {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+}
+
+/* --- Main content and table styling --- */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+/* Button styling */
+.main-content input[type="button"] {
+    background-color: #2e7d32;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+}
+
+.main-content input[type="button"]:hover {
+    background-color: #1b5e20;
+}
+
+/* Table container */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* Table header */
+th {
+    background-color: #388e3c;
+    color: white;
+    text-align: left;
+    padding: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Table rows */
+td {
+    padding: 0.8rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/* Zebra stripes for better readability */
+tr:nth-child(even) {
+    background-color: #f4f9f4;
+}
+
+/* Hover effect */
+tr:hover {
+    background-color: #e8f5e9;
+}
+
+/* Action links */
+td a {
+    text-decoration: none;
+    color: #1b5e20;
+    font-weight: 500;
+    transition: color 0.2s ease-in-out;
+}
+
+td a:hover {
+    color: #43a047;
+}
+
+/* Responsive table */
+@media (max-width: 700px) {
+    table {
+        font-size: 0.9rem;
+    }
+    .navbar ul {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+}
+
+/* --- Pengiriman Form Styling --- */
+.main-content form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    background-color: #f4f9f4;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Dropdown styling */
+.main-content select {
+    width: 100%;
+    padding: 0.7rem 0.8rem;
+    font-size: 1rem;
+    border: 1px solid #c8e6c9;
+    border-radius: 6px;
+    background-color: white;
+    color: #2e7d32;
+    transition: 0.2s ease-in-out;
+}
+
+.main-content select:focus {
+    outline: none;
+    border-color: #2e7d32;
+    box-shadow: 0 0 4px rgba(46, 125, 50, 0.3);
+}
+
+/* Text input styling */
+.main-content input[type="text"] {
+    width: 100%;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid #c8e6c9;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: 0.2s ease-in-out;
+}
+
+.main-content input[type="text"]:focus {
+    outline: none;
+    border-color: #2e7d32;
+    box-shadow: 0 0 4px rgba(46, 125, 50, 0.3);
+}
+
+/* Submit button */
+.main-content input[type="submit"] {
+    background-color: #2e7d32;
+    color: white;
+    border: none;
+    padding: 0.7rem 1.4rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+    width: 100%;
+}
+
+.main-content input[type="submit"]:hover {
+    background-color: #1b5e20;
+}
+
+/* Responsive form */
+@media (max-width: 600px) {
+    .main-content form {
+        padding: 1.5rem;
+        max-width: 90%;
+    }
 }
