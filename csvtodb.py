@@ -50,6 +50,9 @@ def import_csv_to_model(model_class, csv_path):
 
 if __name__ == "__main__":
     with app.app_context():
+        
+        db.create_all()
+        
         print("Starting CSV import...")
 
         import_csv_to_model(Bahan, "bahan.csv")    # imports Bahan table
