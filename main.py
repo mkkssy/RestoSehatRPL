@@ -77,14 +77,14 @@ def index():
 
 @app.route("/stok", methods=['POST', 'GET'])
 def stok():
-    selected_cabang = request.args.get("cabang")  # get cabang filter from query string
+    selected_cabang = request.args.get("cabang")  
 
     if selected_cabang:
         stocks = Stock.query.filter_by(idCabang=selected_cabang).order_by(Stock.idCabang).all()
     else:
         stocks = Stock.query.order_by(Stock.idCabang).all()
 
-    cabangs = Cabang.query.order_by(Cabang.id).all()  # list of Cabang objects for dropdown
+    cabangs = Cabang.query.order_by(Cabang.id).all()  
     return render_template('stok.html', stocks=stocks, cabangs=cabangs, selected_cabang=selected_cabang)
 
 @app.route("/tambah_bahan", methods=['POST', 'GET'])
@@ -196,7 +196,6 @@ def pengiriman():
         selected_cabang_id = request.form["dropdownCabang"]
         jumlah = int(request.form["jmlhBahan"])
 
-        # Get bahan and stock entries
         bahan = Bahan.query.filter_by(id=selected_bahan_id).first()
         if not bahan:
             return "Error: bahan not found."
@@ -207,10 +206,8 @@ def pengiriman():
         if not pusat_stock or pusat_stock.jmlhBahan < jumlah:
             return "Error: Stok pusat tidak cukup."
 
-        # 🔹 Deduct from pusat
         pusat_stock.jmlhBahan -= jumlah
 
-        # 🔹 Add to branch
         if target_stock:
             target_stock.jmlhBahan += jumlah
         else:
@@ -222,7 +219,6 @@ def pengiriman():
             )
             db.session.add(target_stock)
 
-        # 🔹 Record Riwayat for both pusat & cabang
         riwayat_pusat = Riwayat(
             idCabang=pusat_cabang_id,
             idBahan=selected_bahan_id,
@@ -249,7 +245,7 @@ def pengiriman():
 @app.route("/order", methods=['POST', 'GET'])
 def order():
     bahans = Bahan.query.order_by(Bahan.id).all()
-    pusat_cabang_id = "CBG0001"  # Cabang pusat default
+    pusat_cabang_id = "CBG0001" 
 
     if request.method == "POST":
         selected_bahan_id = request.form["dropdownBahan"]
@@ -283,7 +279,6 @@ def order():
         print("Selected bahan id:", repr(selected_bahan_id))
         print("Existing stock entry:", stock_entry)
 
-        # 🔹 Record Riwayat (Masuk ke pusat)
         riwayat = Riwayat(
             idCabang=pusat_cabang_id,
             idBahan=selected_bahan_id,
@@ -312,7 +307,7 @@ def update_stok(idCabang):
     if request.method == "POST":
         idBahan = request.form["idBahan"]
         jumlah_update = int(request.form["jumlah"])
-        tipe = request.form["tipe"]  # "keluar" only (since branch loses item)
+        tipe = request.form["tipe"]  
 
         stok = Stock.query.filter_by(idCabang=idCabang, idBahan=idBahan).first()
         if not stok:
@@ -323,7 +318,6 @@ def update_stok(idCabang):
                 return "Error: stok tidak cukup untuk dikurangi."
             stok.jmlhBahan -= jumlah_update
 
-            # 🔹 Record Riwayat (Keluar dari cabang)
             riwayat = Riwayat(
                 idCabang=idCabang,
                 idBahan=idBahan,
@@ -360,7 +354,6 @@ def update_cabang(id):
 
 @app.route("/riwayat", methods=["GET"])
 def riwayat():
-    # You can filter or sort if you want, e.g. by latest first
     records = Riwayat.query.order_by(Riwayat.tanggal.desc()).all()
     cabangs = {c.id: c.namaCabang for c in Cabang.query.all()}
     bahans = {b.id: b.namaBahan for b in Bahan.query.all()}
@@ -372,14 +365,11 @@ def export_riwayat_csv():
     cabangs = {c.id: c.namaCabang for c in Cabang.query.all()}
     bahans = {b.id: b.namaBahan for b in Bahan.query.all()}
 
-    # Create an in-memory string buffer
     si = StringIO()
     writer = csv.writer(si)
 
-    # Write CSV header
     writer.writerow(["Tanggal", "Cabang", "Bahan", "Masuk", "Keluar"])
 
-    # Write each record
     for r in records:
         writer.writerow([
             r.tanggal.strftime('%Y-%m-%d %H:%M:%S'),
@@ -389,7 +379,6 @@ def export_riwayat_csv():
             r.jmlhKeluar
         ])
 
-    # Prepare the CSV as downloadable file
     output = si.getvalue()
     response = Response(output, mimetype="text/csv")
     response.headers["Content-Disposition"] = "attachment; filename=riwayat.csv"
