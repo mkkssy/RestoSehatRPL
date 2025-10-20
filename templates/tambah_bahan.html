@@ -28,13 +28,13 @@
         </div>
 
         <div class="main-content">
-            <form action="/tambah_bahan", method="POST">
+            <form action="/tambah_bahan" method="POST"> 
                 <label for="namaBahan">Isi Nama:</label>
                 <input type="text" name="namaBahan" id="namaBahan">
                 <label for="satuan">Isi Satuan:</label>
                 <input type="text" name="satuan" id="satuan">
                 <label for="hargaPerSatuan">Isi Harga Per Satuan:</label>
-                <input type="text" name="hargaPerSatuan" id="hargaPerSatuan">
+                <input type="number" step="500" min="500" value="500" name="hargaPerSatuan" id="hargaPerSatuan">
                 <input type="submit" value="Submit">
             </form>
         </div>

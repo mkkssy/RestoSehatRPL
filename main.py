@@ -383,6 +383,6 @@ def export_riwayat_csv():
     response = Response(output, mimetype="text/csv")
     response.headers["Content-Disposition"] = "attachment; filename=riwayat.csv"
     return response
-    
+
 if __name__ == "__main__":
     app.run(debug=True)
