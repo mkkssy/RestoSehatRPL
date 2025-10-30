@@ -1,13 +1,28 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, Response
+from flask import Flask, render_template, request, redirect, url_for, flash, Response, session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import event, ForeignKey
 from datetime import datetime
 import csv
 from io import StringIO
+from flask_login import UserMixin, LoginManager, login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash,check_password_hash
 
 app = Flask(__name__)
+app.secret_key = 'a7f9b1c2d3e4_secure_key_2025'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Stock.db'
 db = SQLAlchemy(app)
+
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password_hash = db.Column(db.String(200), nullable=False)
+    role = db.Column(db.String(50), default='User')
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 class Riwayat(db.Model):
     idPrefix = 'RWT'
@@ -71,9 +86,75 @@ def auto_generate_ids(session, flush_context, instances):
             if hasattr(obj, 'idPrefix'):
                 obj.id = generate_custom_id(obj.__class__)
 
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'  # redirects to this view if user not logged in
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        user = User.query.filter_by(username=username).first()
+
+        if user and user.check_password(password):
+            # ✅ Store login info in session
+            session['user_id'] = user.id
+            session['username'] = user.username
+            session['role'] = user.role
+            return redirect(url_for('index'))
+        else:
+            flash("Invalid username or password", "danger")
+
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        confirm = request.form['confirm']
+
+        # basic validation
+        if password != confirm:
+            flash('Passwords do not match!', 'danger')
+            return redirect(url_for('register'))
+
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
+            flash('Username already exists!', 'danger')
+            return redirect(url_for('register'))
+
+        # create and save new user
+        new_user = User(username=username)
+        new_user.set_password(password)
+        db.session.add(new_user)
+        db.session.commit()
+
+        login_user(new_user)
+        return redirect(url_for('index'))
+
+    return render_template('register.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
 @app.route("/")
+@login_required
 def index():
-    return render_template("index.html")
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    
+    username = session['username']
+    return render_template("index.html", username=username)
 
 @app.route("/stok", methods=['POST', 'GET'])
 def stok():
