@@ -11,7 +11,7 @@
     </div>
     <div class="main-content">
         <div class="home-intro">
-            <h2>Selamat Datang, {{username}}</h2>
+            <h2>Selamat Datang, {% if current_user.is_authenticated %} {{ current_user.username }} {% else %} User {% endif %}</h2>
             <p>Ini adalah dashboard sistem manajemen Restosehat. Lihat ringkasan stok, cabang, pengiriman, dan pesanan untuk memantau operasional restoran secara real-time.</p>
         </div>
 

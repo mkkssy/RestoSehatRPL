@@ -20,6 +20,10 @@
                         <th>ID Karyawan</th>
                         <th>Nama Karyawan</th>
                         <th>Tingkat Akses</th>
+                        <th>Nama Panjang</th>
+                        <th>No Telp</th>
+                        <th>Email</th>
+                        <th>Alamat</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -29,6 +33,10 @@
                         <td>{{ employee.id }}</td>
                         <td>{{ employee.username }}</td>
                         <td>{{ employee.role }}</td>
+                        <td>{{ employee.namaPanjang }}</td>
+                        <td>{{ employee.noTelp }}</td>
+                        <td>{{ employee.email }}</td>
+                        <td>{{ employee.alamat }}</td>
                         <td>
                             {% if employee.role != 'Owner' %}
                             <a href="/delete_karyawan/{{employee.id}}">Delete</a>

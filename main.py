@@ -169,7 +169,6 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route("/")
-@login_required
 def index():
     if 'username' not in session:
         return redirect(url_for('login'))
@@ -227,6 +226,29 @@ def tambahBahan():
     else:
         stocks = Bahan.query.order_by(Bahan.id).all()
         return render_template('tambah_bahan.html', stocks=stocks)
+    
+@app.route("/user_setting", methods=['GET', 'POST'])
+@login_required
+def userSetting():
+    user = User.query.get_or_404(current_user.id)
+
+    if request.method == 'POST':
+        # Get updated values from form
+        user.namaPanjang = request.form.get('namaPanjang')
+        user.email = request.form.get('email')
+        user.noTelp = request.form.get('noTelp')
+        user.alamat = request.form.get('alamat')
+
+        try:
+            db.session.commit()
+            flash('User information successfully updated!', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'An error occurred: {str(e)}', 'danger')
+
+        return redirect(url_for('userSetting'))
+
+    return render_template('user_setting.html', user=user)
     
 @app.route("/bahan")
 @login_required
