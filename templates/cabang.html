@@ -6,58 +6,46 @@
 
 {% block body %}
 <div class="content">
-    <div class="head-name">
-        <p>RESTOSEHAT</p>
+    <div class="head-content">
+        <p>Tabel Cabang</p>
     </div>
-
-    <div class="navbar">
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/stok">Stok</a></li>
-            <li><a href="/cabang">Cabang</a></li>
-            <li><a href="/bahan">Bahan</a></li>
-            <li><a href="/pengiriman">Pengiriman</a></li>
-            <li><a href="/order">Order</a></li>
-            <li><a href="/riwayat">Riwayat</a></li>
-        </ul>
-    </div>
-
-    <div class="content">
-        <div class="head-content">
-            <p>Tabel Cabang</p>
+    <div class="main-content">
+        {% if chains|length < 1 %}
+        <h4>Kosong</h4>
+        {% else %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Cabang</th>
+                        <th>Nama Cabang</th>
+                        {% if current_user.role == 'Owner' %}
+                        <th>Aksi</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for chain in chains %}
+                    <tr>
+                        <td>{{ chain.id }}</td>
+                        <td>{{ chain.namaCabang }}</td>
+                        {% if current_user.role == 'Owner' %}
+                        <td>
+                            <a href="/delete_cabang/{{chain.id}}">Delete</a>
+                            <br>
+                            <a href="/update_cabang/{{chain.id}}">Update</a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-        <div class="main-content">
-            {% if chains|length < 1 %}
-            <h4>Kosong</h4>
-            {% else %}
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID Cabang</th>
-                            <th>Nama Cabang</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for chain in chains %}
-                        <tr>
-                            <td>{{ chain.id }}</td>
-                            <td>{{ chain.namaCabang }}</td>
-                            <td>
-                                <a href="/delete_cabang/{{chain.id}}">Delete</a>
-                                <br>
-                                <a href="/update_cabang/{{chain.id}}">Update</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% endif %}
-            <br><br>
-            <input type="submit" value="Tambah Cabang" onclick="window.location.href='/tambah_cabang'">
-        </div>
+        {% endif %}
+        {% if current_user.role == 'Owner' %}
+        <br><br>
+        <input type="submit" value="Tambah Cabang" onclick="window.location.href='/tambah_cabang'">
+        {% endif %}
     </div>
 </div>
 {% endblock %}

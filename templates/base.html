@@ -9,6 +9,110 @@
         {% block head %}{% endblock %}
     </head>
     <body>
+        <div class="content">
+            <div class="head-name">
+                <p>RESTOSEHAT</p>
+            </div>
+
+            <div class="navbar">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.role == 'Owner'%}
+                        <li class="dropdown">
+                            <a href="#" class="dropbtn">Data Master ▾</a>
+                            <div class="dropdown-content">
+                                <a href="/stok">Stok</a>    
+                                <a href="/cabang">Cabang</a>
+                                <a href="/bahan">Bahan</a>
+                                <a href="/karyawan">Karyawan</a>
+                            </div>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropbtn">Distribusi ▾</a>
+                            <div class="dropdown-content">
+                                <a href="/pengiriman">Pengiriman</a>
+                                <a href="/order">Order</a>
+                            </div>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropbtn">Riwayat ▾</a>
+                            <div class="dropdown-content">
+                                <a href="/riwayatorder">Riwayat Order</a>
+                                <a href="/riwayatstok">Riwayat Stok</a>
+                            </div>
+                        </li>
+                        {% elif current_user.role == 'Manager' %}
+                        <li class="dropdown">
+                            <a href="#" class="dropbtn">Data Master ▾</a>
+                            <div class="dropdown-content">
+                                <a href="/stok">Stok</a>    
+                                <a href="/cabang">Cabang</a>
+                                <a href="/bahan">Bahan</a>
+                                <a href="/karyawan">Karyawan</a>
+                            </div>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropbtn">Riwayat ▾</a>
+                            <div class="dropdown-content">
+                                <a href="/riwayatorder">Riwayat Order</a>
+                                <a href="/riwayatstok">Riwayat Stok</a>
+                            </div>
+                        </li>
+                        {% elif current_user.role == 'Kepala Gudang' %}
+                        <li class="dropdown">
+                            <a href="#" class="dropbtn">Data Master ▾</a>
+                            <div class="dropdown-content">
+                                <a href="/stok">Stok</a>    
+                                <a href="/cabang">Cabang</a>
+                                <a href="/bahan">Bahan</a>
+                            </div>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropbtn">Distribusi ▾</a>
+                            <div class="dropdown-content">
+                                <a href="/pengiriman">Pengiriman</a>
+                                <a href="/order">Order</a>
+                            </div>
+                        </li>
+                        <li><a href="/riwayatstok">Riwayat Stok</a></li>
+                        {% elif current_user.role == 'Bendahara' %}
+                        <li class="dropdown">
+                            <a href="#" class="dropbtn">Data Master ▾</a>
+                            <div class="dropdown-content">
+                                <a href="/stok">Stok</a>    
+                                <a href="/cabang">Cabang</a>
+                                <a href="/bahan">Bahan</a>
+                            </div>
+                        </li>
+                        <li><a href="/riwayatorder">Riwayat Order</a></li>
+                        {% elif current_user.role == 'Staf Pembelian' %}
+                        <li class="dropdown">
+                            <a href="#" class="dropbtn">Data Master ▾</a>
+                            <div class="dropdown-content">
+                                <a href="/stok">Stok</a>    
+                                <a href="/cabang">Cabang</a>
+                                <a href="/bahan">Bahan</a>
+                            </div>
+                        </li>
+                        <li><a href="/order">Order</a></li>
+                        <li><a href="/riwayatorder">Riwayat Order</a></li>
+                        {% endif %}
+
+                        <li class="dropdown">
+                            <a href="#" class="dropbtn">User ▾</a>
+                            <div class="dropdown-content">
+                                <a href="/user_setting">Pengaturan User</a>
+                                <a href="/logout">Logout</a>
+                            </div>
+                        </li>
+                    
+                    {% else %}
+                    <li><a href="/login">Login</a></li>
+                    {% endif %}
+                </ul>
+            </div>
         {% block body %}{% endblock %}
+        </div>
     </body>
 </html>

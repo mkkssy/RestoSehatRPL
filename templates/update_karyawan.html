@@ -9,17 +9,13 @@
     <h4>Register Account</h4>
     <form method="POST">
         <label>Username</label>
-        <input type="text" name="username" class="form-control" required>
-        <label>Password</label>
-        <input type="password" name="password" class="form-control" required>
-        <label>Confirm Password</label>
-        <input type="password" name="confirm" class="form-control" required>
+        <input type="text" name="username" class="form-control" value="{{user.username}}" required>
         <label>Tingkat Akses</label>
         <select id="dropdownAkses" name="dropdownAkses">
-            <option value="Manager">Manager</option>
-            <option value="Kepala Gudang">Kepala Gudang</option>
-            <option value="Bendahara">Bendahara</option>
-            <option value="Staf Pembelian">Staf Pembelian</option>
+            <option value="Manager" {% if user.role == "Manager" %}selected{% endif %}>Manager</option>
+            <option value="Kepala Gudang" {% if user.role == "Kepala Gudang" %}selected{% endif %}>Kepala Gudang</option>
+            <option value="Bendahara" {% if user.role == "Bendahara" %}selected{% endif %}>Bendahara</option>
+            <option value="Staf Pembelian" {% if user.role == "Staf Pembelian" %}selected{% endif %}>Staf Pembelian</option>
         </select>
         <input type="submit" value="Register">
     </form>

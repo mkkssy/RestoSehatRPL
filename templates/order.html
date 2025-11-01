@@ -6,67 +6,49 @@
 
 {% block body %}
 <div class="content">
-    <div class="head-name">
-        <p>RESTOSEHAT</p>
+    <div class="head-content">
+        <p>Order Bahan</p>
     </div>
+    <div class="main-content">
+        <form action="/order" method="POST" id="orderForm">
+            <label for="dropdownBahan">Pilih Bahan:</label>
+            <select id="dropdownBahan" name="dropdownBahan" onchange="updateHarga()">
+                <option value="">--Pilih Bahan--</option>
+                {% for bahan in bahans %}
+                <option value="{{bahan.id}}" data-harga="{{bahan.hargaPerSatuan}}">
+                    {{bahan.namaBahan}} ({{bahan.satuan}}) - Rp{{"{:,}".format(bahan.hargaPerSatuan)}}
+                </option>
+                {% endfor %}
+            </select>
 
-    <div class="navbar">
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/stok">Stok</a></li>
-            <li><a href="/cabang">Cabang</a></li>
-            <li><a href="/bahan">Bahan</a></li>
-            <li><a href="/pengiriman">Pengiriman</a></li>
-            <li><a href="/order">Order</a></li>
-            <li><a href="/riwayat">Riwayat</a></li>
-        </ul>
+            <br>
+            <label for="jmlhBahan">Jumlah:</label>
+            <input type="number" id="jmlhBahan" name="jmlhBahan" value="1" min="1" onchange="updateTotal()">
+
+            <br>
+            <p>Harga per satuan: <span id="hargaSatuan">-</span></p>
+            <p><b>Total Harga:</b> <span id="totalHarga">-</span></p>
+
+            <br>
+            <input type="submit" value="Order">
+        </form>
     </div>
-
-    <div class="content">
-        <div class="head-content">
-            <p>Order Bahan</p>
-        </div>
-        <div class="main-content">
-            <form action="/order" method="POST" id="orderForm">
-                <label for="dropdownBahan">Pilih Bahan:</label>
-                <select id="dropdownBahan" name="dropdownBahan" onchange="updateHarga()">
-                    <option value="">--Pilih Bahan--</option>
-                    {% for bahan in bahans %}
-                    <option value="{{bahan.id}}" data-harga="{{bahan.hargaPerSatuan}}">
-                        {{bahan.namaBahan}} ({{bahan.satuan}}) - Rp{{"{:,}".format(bahan.hargaPerSatuan)}}
-                    </option>
-                    {% endfor %}
-                </select>
-
-                <br>
-                <label for="jmlhBahan">Jumlah:</label>
-                <input type="number" id="jmlhBahan" name="jmlhBahan" value="1" min="1" onchange="updateTotal()">
-
-                <br>
-                <p>Harga per satuan: <span id="hargaSatuan">-</span></p>
-                <p><b>Total Harga:</b> <span id="totalHarga">-</span></p>
-
-                <br>
-                <input type="submit" value="Order">
-            </form>
-        </div>
-    </div>
-    <script>
-    function updateHarga() {
-        const select = document.getElementById("dropdownBahan");
-        const harga = select.options[select.selectedIndex].getAttribute("data-harga");
-        document.getElementById("hargaSatuan").innerText = harga ? "Rp " + parseInt(harga).toLocaleString() : "-";
-        updateTotal();
-    }
-
-    function updateTotal() {
-        const select = document.getElementById("dropdownBahan");
-        const harga = parseInt(select.options[select.selectedIndex].getAttribute("data-harga") || 0);
-        const jumlah = parseInt(document.getElementById("jmlhBahan").value || 0);
-        const total = harga * jumlah;
-        document.getElementById("totalHarga").innerText = total ? "Rp " + total.toLocaleString() : "-";
-    }
-    </script>
 </div>
+<script>
+function updateHarga() {
+    const select = document.getElementById("dropdownBahan");
+    const harga = select.options[select.selectedIndex].getAttribute("data-harga");
+    document.getElementById("hargaSatuan").innerText = harga ? "Rp " + parseInt(harga).toLocaleString() : "-";
+    updateTotal();
+}
+
+function updateTotal() {
+    const select = document.getElementById("dropdownBahan");
+    const harga = parseInt(select.options[select.selectedIndex].getAttribute("data-harga") || 0);
+    const jumlah = parseInt(document.getElementById("jmlhBahan").value || 0);
+    const total = harga * jumlah;
+    document.getElementById("totalHarga").innerText = total ? "Rp " + total.toLocaleString() : "-";
+}
+</script>
 
 {% endblock %}

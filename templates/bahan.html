@@ -6,62 +6,50 @@
 
 {% block body %}
 <div class="content">
-    <div class="head-name">
-        <p>RESTOSEHAT</p>
+    <div class="head-content">
+        <p>Tabel Bahan</p>
     </div>
-
-    <div class="navbar">
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/stok">Stok</a></li>
-            <li><a href="/cabang">Cabang</a></li>
-            <li><a href="/bahan">Bahan</a></li>
-            <li><a href="/pengiriman">Pengiriman</a></li>
-            <li><a href="/order">Order</a></li>
-            <li><a href="/riwayat">Riwayat</a></li>
-        </ul>
-    </div>
-
-    <div class="content">
-        <div class="head-content">
-            <p>Tabel Bahan</p>
+    <div class="main-content">
+        {% if items|length < 1 %}
+        <h4>Kosong</h4>
+        {% else %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nama</th>
+                        <th>Satuan</th>
+                        <th>Harga/Satuan</th>
+                        {% if current_user.role == 'Staf Pembelian' %}
+                        <th>Aksi</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.namaBahan }}</td>
+                        <td>{{ item.satuan }}</td>
+                        <td>{{ item.hargaPerSatuan }}</td>
+                        {% if current_user.role == 'Staf Pembelian' %}
+                        <td>
+                            <a href="/delete_bahan/{{chain.id}}">Delete</a>
+                            <br>
+                            <a href="/update_bahan/{{chain.id}}">Update</a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-        <div class="main-content">
-            {% if items|length < 1 %}
-            <h4>Kosong</h4>
-            {% else %}
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nama</th>
-                            <th>Satuan</th>
-                            <th>Harga/Satuan</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in items %}
-                        <tr>
-                            <td>{{ item.id }}</td>
-                            <td>{{ item.namaBahan }}</td>
-                            <td>{{ item.satuan }}</td>
-                            <td>{{ item.hargaPerSatuan }}</td>
-                            <td>
-                                <a href="/delete_bahan/{{item.id}}">Delete</a>
-                                <br>
-                                <a href="/update_bahan/{{item.id}}">Update</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% endif %}
-            <br><br>
-            <input type="submit" value="Tambah Bahan" onclick="window.location.href='/tambah_bahan'">
-        </div>
+        {% endif %}
+        {% if current_user.role == 'Staf Pembelian' %}
+        <br><br>
+        <input type="submit" value="Tambah Bahan" onclick="window.location.href='/tambah_bahan'">
+        {% endif %}
     </div>
 </div>
 {% endblock %}

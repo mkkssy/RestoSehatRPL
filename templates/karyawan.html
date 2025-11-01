@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="head-content">
+        <p>Tabel Cabang</p>
+    </div>
+    <div class="main-content">
+        {% if employees|length < 1 %}
+        <h4>Kosong</h4>
+        {% else %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Karyawan</th>
+                        <th>Nama Karyawan</th>
+                        <th>Tingkat Akses</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employee in employees %}
+                    <tr>
+                        <td>{{ employee.id }}</td>
+                        <td>{{ employee.username }}</td>
+                        <td>{{ employee.role }}</td>
+                        <td>
+                            {% if employee.role != 'Owner' %}
+                            <a href="/delete_karyawan/{{employee.id}}">Delete</a>
+                            <br>
+                            <a href="/update_karyawan/{{employee.id}}">Update</a>
+                            <br>
+                            <a href="/change_password/{{employee.id}}">Ganti Password</a>
+                            {% endif %}
+                            {% if employee.role == 'Owner' and current_user.role == 'Owner'  %}
+                            <a href="change_password/{{employee.id}}">Ganti Password</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        <br><br>
+        <input type="submit" value="Daftarkan Karyawan Baru" onclick="window.location.href='/register'">
+    </div>
+</div>
+{% endblock %}

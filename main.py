@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, Response, session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import event, ForeignKey
+from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 import csv
 from io import StringIO
@@ -13,10 +14,15 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Stock.db'
 db = SQLAlchemy(app)
 
 class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
+    idPrefix = 'USR'
+    id = db.Column(db.String(5), primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(50), default='User')
+    namaPanjang = db.Column(db.String(200), unique=True)
+    email = db.Column(db.String(100), unique=True)
+    noTelp = db.Column(db.String(12), unique=True)
+    alamat = db.Column(db.String(150), unique=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -92,7 +98,7 @@ login_manager.login_view = 'login'  # redirects to this view if user not logged 
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return User.query.get(user_id)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -107,17 +113,21 @@ def login():
             session['user_id'] = user.id
             session['username'] = user.username
             session['role'] = user.role
+            login_user(user)
             return redirect(url_for('index'))
         else:
             flash("Invalid username or password", "danger")
+            return redirect(url_for('login'))
 
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
+@login_required
 def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        role = request.form['dropdownAkses']
         confirm = request.form['confirm']
 
         # basic validation
@@ -131,7 +141,7 @@ def register():
             return redirect(url_for('register'))
 
         # create and save new user
-        new_user = User(username=username)
+        new_user = User(username=username, role=role)
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
@@ -157,6 +167,7 @@ def index():
     return render_template("index.html", username=username)
 
 @app.route("/stok", methods=['POST', 'GET'])
+@login_required
 def stok():
     selected_cabang = request.args.get("cabang")  
 
@@ -169,6 +180,7 @@ def stok():
     return render_template('stok.html', stocks=stocks, cabangs=cabangs, selected_cabang=selected_cabang)
 
 @app.route("/tambah_bahan", methods=['POST', 'GET'])
+@login_required
 def tambahBahan():
     if request.method == 'POST':
         namaBahan = request.form.getlist('namaBahan')
@@ -206,11 +218,13 @@ def tambahBahan():
         return render_template('tambah_bahan.html', stocks=stocks)
     
 @app.route("/bahan")
+@login_required
 def bahan():
     items = Bahan.query.order_by(Bahan.id).all()
     return render_template('bahan.html', items=items)
 
 @app.route("/tambah_cabang", methods=['POST', 'GET'])
+@login_required
 def tambahCabang():
     if request.method == 'POST':
         cabang = request.form['namaCabang']
@@ -238,11 +252,19 @@ def tambahCabang():
         return render_template('tambah_cabang.html', chains=chains)
 
 @app.route("/cabang")
+@login_required
 def cabang():
     chains = Cabang.query.order_by(Cabang.id).all()
     return render_template('cabang.html', chains=chains)
 
+@app.route("/karyawan")
+@login_required
+def karyawan():
+    employees = User.query.order_by(User.id).all()
+    return render_template('karyawan.html', employees=employees)
+
 @app.route("/delete_bahan/<string:id>")
+@login_required
 def deleteBahan(id):
     itemToDelete = Bahan.query.get_or_404(id)
 
@@ -255,6 +277,7 @@ def deleteBahan(id):
         return "There was a problem deleting data"
     
 @app.route("/delete_cabang/<string:id>")
+@login_required
 def deleteCabang(id):
     chainToDelete = Cabang.query.get_or_404(id)
 
@@ -267,6 +290,7 @@ def deleteCabang(id):
         return "There was a problem deleting data"
     
 @app.route("/pengiriman", methods=['POST', 'GET'])
+@login_required
 def pengiriman():
     pusat_cabang_id = "CBG0001"
     bahans = Bahan.query.order_by(Bahan.id).all()
@@ -324,6 +348,7 @@ def pengiriman():
     return render_template("pengiriman.html", bahans=bahans, cabangs=cabangs)
 
 @app.route("/order", methods=['POST', 'GET'])
+@login_required
 def order():
     bahans = Bahan.query.order_by(Bahan.id).all()
     pusat_cabang_id = "CBG0001" 
@@ -380,6 +405,7 @@ def order():
     return render_template("order.html", bahans=bahans)
 
 @app.route("/update_stok/<string:idCabang>", methods=["POST", "GET"])
+@login_required
 def update_stok(idCabang):
     cabang = Cabang.query.get_or_404(idCabang)
     stok_list = Stock.query.filter_by(idCabang=idCabang).all()
@@ -414,6 +440,7 @@ def update_stok(idCabang):
     return render_template("update_stok.html", cabang=cabang, stok_list=stok_list, bahans=bahans)
 
 @app.route("/update_bahan/<string:id>", methods=['POST', 'GET'])
+@login_required
 def update_bahan(id):
     bahan = Bahan.query.get_or_404(id)
     if request.method == "POST":
@@ -424,7 +451,70 @@ def update_bahan(id):
         return redirect("/bahan")
     return render_template("update_bahan.html", bahan=bahan)
 
+@app.route("/update_karyawan/<string:id>", methods=['POST', 'GET'])
+@login_required
+def update_karyawan(id):
+    user = User.query.get_or_404(id)
+    if request.method == "POST":
+        # Capture submitted data
+        new_username = request.form["username"]
+        new_role = request.form["dropdownAkses"]
+
+        # Check if another user already has the submitted username
+        with db.session.no_autoflush:
+            existing_user = User.query.filter_by(username=new_username).first()
+            if existing_user and existing_user.id != user.id:
+                flash('Username already exists!', 'danger')
+                return redirect(url_for('update_karyawan', id=id))
+
+        # Update the user object after check
+        user.username = new_username
+        user.role = new_role
+        
+        try:
+            db.session.commit()
+            flash('User successfully updated!', 'success')
+        except IntegrityError:
+            db.session.rollback()
+            flash('A database error occurred. Please try again.', 'danger')
+
+        return redirect("/karyawan")
+    
+    return render_template("update_karyawan.html", user=user)
+
+@app.route("/change_password/<string:id>", methods=['POST', 'GET'])
+@login_required
+def change_password(id):
+    user = User.query.get_or_404(id)
+    if request.method == "POST":
+        # Capture submitted data
+        new_password = request.form["password"]
+        confirm = request.form["confirm"]
+
+        # basic validation
+        if new_password != confirm:
+            flash('Passwords do not match!', 'danger')
+            return redirect(url_for('change_password', id=id))
+        
+        if check_password_hash(user.password_hash, new_password):
+            flash('New password cannot be the same as the old password!', 'danger')
+            return redirect(url_for('change_password', id=id))
+        
+        user.password = generate_password_hash(new_password)
+
+        try:
+            db.session.commit()
+            flash('Password successfully updated!', 'success')
+        except IntegrityError:
+            db.session.rollback()
+            flash('A database error occurred. Please try again.', 'danger')
+
+        return redirect("/home")
+    
+    return render_template("change_password.html", user=user)
+
 @app.route("/update_cabang/<string:id>", methods=['POST', 'GET'])
+@login_required
 def update_cabang(id):
     cabang = Cabang.query.get_or_404(id)
     if request.method == "POST":
@@ -433,14 +523,16 @@ def update_cabang(id):
         return redirect("/cabang")
     return render_template("update_cabang.html", cabang=cabang)
 
-@app.route("/riwayat", methods=["GET"])
+@app.route("/riwayatstok", methods=["GET"])
+@login_required
 def riwayat():
     records = Riwayat.query.order_by(Riwayat.tanggal.desc()).all()
     cabangs = {c.id: c.namaCabang for c in Cabang.query.all()}
     bahans = {b.id: b.namaBahan for b in Bahan.query.all()}
-    return render_template("riwayat.html", records=records, cabangs=cabangs, bahans=bahans)
+    return render_template("riwayatstok.html", records=records, cabangs=cabangs, bahans=bahans)
 
 @app.route("/riwayat/export_csv")
+@login_required
 def export_riwayat_csv():
     records = Riwayat.query.order_by(Riwayat.tanggal.desc()).all()
     cabangs = {c.id: c.namaCabang for c in Cabang.query.all()}

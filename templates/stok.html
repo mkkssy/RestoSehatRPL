@@ -6,78 +6,64 @@
 
 {% block body %}
 <div class="content">
-    <div class="head-name">
-        <p>RESTOSEHAT</p>
+    <div class="head-content">
+        <p>Tabel Stok</p>
     </div>
-
-    <div class="navbar">
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/stok">Stok</a></li>
-            <li><a href="/cabang">Cabang</a></li>
-            <li><a href="/bahan">Bahan</a></li>
-            <li><a href="/pengiriman">Pengiriman</a></li>
-            <li><a href="/order">Order</a></li>
-            <li><a href="/riwayat">Riwayat</a></li>
-        </ul>
-    </div>
-
-    <div class="content">
-        <div class="head-content">
-            <p>Tabel Stok</p>
+    <div class="main-content">
+        {% if stocks|length < 1 %}
+        <h4>Kosong</h4>
+        {% else %}
+        <div class="filter">
+            <form method="get" action="{{ url_for('stok') }}">
+                <label for="cabang">Filter by Cabang:</label>
+                <select name="cabang" id="cabang">
+                    <option value="">Semua</option>
+                    {% for cabang in cabangs %}
+                        <option value="{{ cabang.id }}" {% if selected_cabang == cabang.id %}selected{% endif %}>
+                            {{ cabang.namaCabang }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <input type="submit" value="Filter">
+            </form>
         </div>
-        <div class="main-content">
-            {% if stocks|length < 1 %}
-            <h4>Kosong</h4>
-            {% else %}
-            <div class="filter">
-                <form method="get" action="{{ url_for('stok') }}">
-                    <label for="cabang">Filter by Cabang:</label>
-                    <select name="cabang" id="cabang">
-                        <option value="">Semua</option>
-                        {% for cabang in cabangs %}
-                            <option value="{{ cabang.id }}" {% if selected_cabang == cabang.id %}selected{% endif %}>
-                                {{ cabang.namaCabang }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                    <input type="submit" value="Filter">
-                </form>
-            </div>
 
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID Cabang</th>
-                            <th>ID Bahan</th>
-                            <th>Nama Bahan</th>
-                            <th>Jmlh Bahan</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for stock in stocks %}
-                        <tr>
-                            <td>{{ stock.idCabang }}</td>
-                            <td>{{ stock.idBahan }}</td>
-                            <td>{{ stock.namaBahan }}</td>
-                            <td>{{ stock.jmlhBahan }}</td>
-                            <td>
-                                {% if stock.idCabang == 'CBG0001' %}
-                                <a href="/order">Update</a>
-                                {% else %}
-                                <a href="/update_stok/{{stock.idCabang}}">Update</a>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-                
-            {% endif %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Cabang</th>
+                        <th>ID Bahan</th>
+                        <th>Nama Bahan</th>
+                        <th>Jmlh Bahan</th>
+                        {% if current_user.role == 'Kepala Gudang' %}
+                        <th>Aksi</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stock in stocks %}
+                    <tr>
+                        <td>{{ stock.idCabang }}</td>
+                        <td>{{ stock.idBahan }}</td>
+                        <td>{{ stock.namaBahan }}</td>
+                        <td>{{ stock.jmlhBahan }}</td>
+                        {% if current_user.role == 'Kepala Gudang' %}
+                        <td>
+                            {% if stock.idCabang == 'CBG0001' %}
+                            <a href="/order">Update</a>
+                            {% else %}
+                            <a href="/update_stok/{{stock.idCabang}}">Update</a>
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
+            
+        {% endif %}
     </div>
 </div>
 {% endblock %}

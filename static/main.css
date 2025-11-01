@@ -47,6 +47,76 @@ body {
     padding: 0;
 }
 
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* button */
+.dropdown > a {
+  position: relative;
+  z-index: 2; /* keep above buffer */
+}
+
+/* hidden dropdown content using opacity/visibility so transitions work */
+.dropdown-content {
+  position: absolute;
+  left: 0;
+  top: 100%;               /* flush directly under the button */
+  margin-top: 0;           /* ensure no gap */
+  min-width: 100%;
+  border-radius: 8px;
+  background: #388e3c;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  z-index: 1000;
+
+  /* hide by default but keep in layout for hover detection */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  /* smooth fade/slide */
+  transform: translateY(-6px);
+  transition: opacity 160ms ease, transform 160ms ease, visibility 160ms;
+}
+
+/* show the dropdown */
+.dropdown:hover .dropdown-content,
+.dropdown .dropdown-content:hover {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* tiny invisible buffer to catch slow cursor movement */
+.dropdown > a::after {
+  /* an invisible strip between the button and the menu */
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 10px;            /* buffer height: increase if needed */
+  background: transparent;
+  z-index: 1;              /* below the button, above page so it catches the cursor */
+  pointer-events: auto;    /* must allow pointer events so hover remains active */
+}
+
+/* dropdown link styles (match your theme) */
+.dropdown-content a {
+  color: #2e7d32;
+  padding: 0.7rem 1rem;
+  display: block;
+  text-decoration: none;
+}
+.dropdown-content a:hover {
+  background: #e8f5e9;
+}
+
+/* Right-side user dropdown alignment if you use it */
+.user-dropdown { margin-left: auto; }
+
 /* Navbar links */
 .navbar a {
     text-decoration: none;

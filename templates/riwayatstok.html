@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="head-content">
+        <p>Riwayat Pengiriman dan Penerimaan</p>
+    </div>
+    <div class="main-content">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Cabang</th>
+                        <th>Bahan</th>
+                        <th>Masuk</th>
+                        <th>Keluar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in records %}
+                    <tr>
+                        <td>{{ r.tanggal.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>{{ cabangs.get(r.idCabang, 'Unknown') }}</td>
+                        <td>{{ bahans.get(r.idBahan, 'Unknown') }}</td>
+                        <td>{{ r.jmlhMasuk }}</td>
+                        <td>{{ r.jmlhKeluar }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <a href="{{ url_for('export_riwayat_csv') }}" class="btn btn-primary" style="margin-bottom:10px;">
+            Export Riwayat as CSV
+        </a>
+    </div>
+</div>
+{% endblock %}
