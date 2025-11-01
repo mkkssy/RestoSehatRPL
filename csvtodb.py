@@ -1,7 +1,7 @@
 import pandas as pd 
 from datetime import datetime 
 from main import app, db 
-from main import Bahan, Cabang, Stock, Riwayat
+from main import Bahan, Cabang, Stock, Riwayat, User
 
 def import_csv_to_model(model_class, csv_path):
     df = pd.read_csv(csv_path)
@@ -52,6 +52,10 @@ if __name__ == "__main__":
     with app.app_context():
         
         db.create_all()
+        new_user = User(username='Max', role='Owner')
+        new_user.set_password('testpassword')
+        db.session.add(new_user)
+        db.session.commit()
         
         print("Starting CSV import...")
 

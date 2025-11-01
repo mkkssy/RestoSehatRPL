@@ -31,13 +31,25 @@ class User(db.Model, UserMixin):
         return check_password_hash(self.password_hash, password)
 
 class Riwayat(db.Model):
-    idPrefix = 'RWT'
+    idPrefix = 'RWS'
     id = db.Column(db.String(5), primary_key=True)
     idCabang = db.Column(db.String(5), db.ForeignKey('cabang.id'), nullable=False)
     idBahan = db.Column(db.String(5), db.ForeignKey('bahan.id'), nullable=False)
     tanggal = db.Column(db.DateTime, default=datetime.utcnow)
     jmlhMasuk = db.Column(db.Integer, default=0)
     jmlhKeluar = db.Column(db.Integer, default=0)
+
+    def __repr__ (self):
+        return f'<Riwayat {self.id}>'
+    
+class RiwayatTransaksi(db.Model):
+    idPrefix = 'RWT'
+    id = db.Column(db.String(5), primary_key=True)
+    idBahan = db.Column(db.String(5), db.ForeignKey('bahan.id'), nullable=False)
+    tanggal = db.Column(db.DateTime, default=datetime.utcnow)
+    jmlh = db.Column(db.Integer, default=0)
+    hrgPer = db.Column(db.Integer, default=0)
+    hrgTot = db.Column(db.Integer, default=0)
 
     def __repr__ (self):
         return f'<Riwayat {self.id}>'
@@ -146,7 +158,6 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        login_user(new_user)
         return redirect(url_for('index'))
 
     return render_template('register.html')
@@ -395,11 +406,23 @@ def order():
         db.session.add(riwayat)
         db.session.commit()
 
+        riwayatTransaksi = RiwayatTransaksi(
+            idBahan=selected_bahan_id,
+            tanggal=datetime.now(),
+            jmlh=jumlah,
+            hrgPer=bahan.hargaPerSatuan,
+            hrgTot=total_cost
+        )
+        db.session.add(riwayatTransaksi)
+        db.session.commit()
+
         return render_template(
             "order_success.html",
             bahan=bahan,
             jumlah=jumlah,
-            total=total_cost
+            total=total_cost,
+            hrgPer=bahan.hargaPerSatuan,
+            hrgTot=total_cost
         )
 
     return render_template("order.html", bahans=bahans)
@@ -531,6 +554,13 @@ def riwayat():
     bahans = {b.id: b.namaBahan for b in Bahan.query.all()}
     return render_template("riwayatstok.html", records=records, cabangs=cabangs, bahans=bahans)
 
+@app.route("/riwayattransaksi", methods=["GET"])
+@login_required
+def riwayat_transaksi():
+    records = RiwayatTransaksi.query.order_by(RiwayatTransaksi.tanggal.desc()).all()
+    bahans = {b.id: b.namaBahan for b in Bahan.query.all()}
+    return render_template("riwayattransaksi.html", records=records, bahans=bahans)
+
 @app.route("/riwayat/export_csv")
 @login_required
 def export_riwayat_csv():
@@ -555,6 +585,31 @@ def export_riwayat_csv():
     output = si.getvalue()
     response = Response(output, mimetype="text/csv")
     response.headers["Content-Disposition"] = "attachment; filename=riwayat.csv"
+    return response
+
+@app.route("/riwayat_transaksi/export_csv")
+@login_required
+def export_riwayat_transaksi_csv():
+    records = RiwayatTransaksi.query.order_by(RiwayatTransaksi.tanggal.desc()).all()
+    bahans = {b.id: b.namaBahan for b in Bahan.query.all()}
+
+    si = StringIO()
+    writer = csv.writer(si)
+
+    writer.writerow(["Tanggal", "Cabang", "Bahan", "Masuk", "Keluar"])
+
+    for r in records:
+        writer.writerow([
+            r.tanggal.strftime('%Y-%m-%d %H:%M:%S'),
+            bahans.get(r.idBahan, 'Unknown'),
+            r.jmlh,
+            r.hrgPer,
+            r.hrgTot
+        ])
+
+    output = si.getvalue()
+    response = Response(output, mimetype="text/csv")
+    response.headers["Content-Disposition"] = "attachment; filename=riwayat_transaksi.csv"
     return response
 
 if __name__ == "__main__":
