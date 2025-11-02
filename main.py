@@ -587,7 +587,7 @@ def change_password(id):
         confirm = request.form["confirm"]
 
         if len(new_password) <8:
-            flash('Username (2) atau Password (8) terlalu pendek!', 'danger')
+            flash('Password (8) terlalu pendek!', 'danger')
             return redirect(url_for('change_password', id=id))
 
         # basic validation
@@ -603,12 +603,13 @@ def change_password(id):
         
         try:
             db.session.commit()
-            flash('Password successfully updated!', 'success')
+            flash('Password berhasil diganti!', 'success')
+            return redirect("/")    
         except IntegrityError:
             db.session.rollback()
-            flash('A database error occurred. Please try again.', 'danger')
+            flash('Terjadi kesalahan database!', 'danger')
+            return redirect("/")
 
-        return redirect("/")
     
     return render_template("change_password.html", user=user)
 
