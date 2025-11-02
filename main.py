@@ -539,8 +539,8 @@ def change_password(id):
             flash('New password cannot be the same as the old password!', 'danger')
             return redirect(url_for('change_password', id=id))
         
-        user.password = generate_password_hash(new_password)
-
+        user.password_hash = generate_password_hash(new_password)
+        
         try:
             db.session.commit()
             flash('Password successfully updated!', 'success')
@@ -548,7 +548,7 @@ def change_password(id):
             db.session.rollback()
             flash('A database error occurred. Please try again.', 'danger')
 
-        return redirect("/home")
+        return redirect("/")
     
     return render_template("change_password.html", user=user)
 
