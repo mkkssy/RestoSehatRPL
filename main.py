@@ -542,7 +542,7 @@ def change_password(id):
             flash('New password cannot be the same as the old password!', 'danger')
             return redirect(url_for('change_password', id=id))
         
-        user.password_hash_hash = generate_password_hash(new_password)
+        user.password_hash = generate_password_hash(new_password)
         
         try:
             db.session.commit()
