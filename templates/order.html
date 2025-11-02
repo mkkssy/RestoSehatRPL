@@ -10,7 +10,8 @@
         <p>Order Bahan</p>
     </div>
     <div class="main-content">
-        <form action="/order" method="POST" id="orderForm">
+        <form action="/order" method="POST" id="orderForm"
+      onsubmit="return handleOrderSubmit(event);">
             <label for="dropdownBahan">Pilih Bahan:</label>
             <select id="dropdownBahan" name="dropdownBahan" onchange="updateHarga()">
                 <option value="">--Pilih Bahan--</option>
@@ -50,5 +51,50 @@ function updateTotal() {
     document.getElementById("totalHarga").innerText = total ? "Rp " + total.toLocaleString() : "-";
 }
 </script>
+<script>
+function handleOrderSubmit(e) {
+    // Ambil elemen
+    const select = document.getElementById("dropdownBahan");
+    const jumlahInput = document.getElementById("jmlhBahan");
+    
+    // Ambil data dari opsi yang dipilih
+    const selectedOption = select.options[select.selectedIndex];
+    const namaBahan = selectedOption.text || "-";
+    const hargaPerSatuan = parseInt(selectedOption.getAttribute("data-harga") || 0);
+    const jumlah = parseInt(jumlahInput.value || 0);
+    const total = hargaPerSatuan * jumlah;
+
+    // Jika belum pilih bahan
+    if (!selectedOption.value) {
+        alert("⚠️ Silakan pilih bahan terlebih dahulu.");
+        return false;
+    }
+
+    // Konfirmasi awal
+    const konfirmasi = confirm(
+        `Yakin melakukan order ini?\n\n` +
+        `Bahan : ${namaBahan}\n` +
+        `Jumlah : ${jumlah}\n` +
+        `Total Harga : Rp${total.toLocaleString('id-ID')}`
+    );
+
+    // Jika tekan Cancel, hentikan
+    if (!konfirmasi) {
+        alert("❌ Order dibatalkan.");
+        return false;
+    }
+
+    // Kalau OK, tampilkan popup hasil order
+    alert(
+        `✅ Order Berhasil!\n\n` +
+        `Bahan: ${namaBahan}\n` +
+        `Jumlah: ${jumlah}\n` +
+        `Total Harga: Rp${total.toLocaleString('id-ID')}`
+    );
+
+    return true; // lanjutkan submit ke Flask backend
+}
+</script>
+
 
 {% endblock %}

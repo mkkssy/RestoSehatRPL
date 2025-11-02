@@ -10,7 +10,8 @@
         <p>Pengiriman Bahan</p>
     </div>
     <div class="main-content">
-        <form action="/pengiriman" method="POST">
+        <form action="/pengiriman" method="POST" id="pengirimanForm"
+        onsubmit="return handlePengirimanSubmit(event);">
             <label for="dropdownBahan">Pilih Bahan:</label>
             <select id="dropdownBahan" name="dropdownBahan">
                 {% for bahan in bahans %}
@@ -27,6 +28,19 @@
             <input type="number" id="jmlhBahan" name="jmlhBahan" value="1" min="1">
             <br>
             <input type="submit" value="Submit">
+            <script>
+    function handlePengirimanSubmit(e) {
+
+    const yakin = confirm("Yakin melakukan pengiriman ini?");
+    if (yakin) {
+        alert("✅ Pengiriman berhasil!");  
+        return true;  
+    } else {
+        alert("❌ Pengiriman dibatalkan.");
+        return false; 
+    }
+}
+</script>
         </form>
     </div>
 </div>

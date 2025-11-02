@@ -438,14 +438,8 @@ def order():
         db.session.add(riwayatTransaksi)
         db.session.commit()
 
-        return render_template(
-            "order_success.html",
-            bahan=bahan,
-            jumlah=jumlah,
-            total=total_cost,
-            hrgPer=bahan.hargaPerSatuan,
-            hrgTot=total_cost
-        )
+
+    
 
     return render_template("order.html", bahans=bahans)
 
