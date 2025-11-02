@@ -177,7 +177,7 @@ def register():
         db.session.commit()
 
         flash('Pendaftaran Karyawan baru berhasil!', 'success')
-        return redirect(url_for('karyawan.html'))
+        return redirect(url_for('karyawan'))
 
     return render_template('register.html')
 
