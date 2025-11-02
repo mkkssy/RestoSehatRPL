@@ -708,3 +708,16 @@ table th:nth-child(5), table td:nth-child(5) { width: 12ch; }  /* No Telp */
 table th:nth-child(6), table td:nth-child(6) { width: 28ch; }  /* Email */
 table th:nth-child(7), table td:nth-child(7) { width: 18ch; }  /* Alamat */
 table th:nth-child(8), table td:nth-child(8) { width: 12ch; }  /* Aksi */
+
+.flash-messages {
+    display: flex;
+    flex-direction: column;
+    align-items: center;  /* Centers horizontally */
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.flash-messages .alert {
+    width: 50%; /* or auto, or a max-width like 600px */
+    text-align: center;
+}

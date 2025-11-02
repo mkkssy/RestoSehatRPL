@@ -7,11 +7,25 @@ import csv
 from io import StringIO
 from flask_login import UserMixin, LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash,check_password_hash
+from functools import wraps
 
 app = Flask(__name__)
 app.secret_key = 'a7f9b1c2d3e4_secure_key_2025'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Stock.db'
 db = SQLAlchemy(app)
+
+def role_required(*roles):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            session_role = session.get('role')
+            
+            if session_role not in roles:
+                flash('Access Denied!', 'danger')
+                return redirect(url_for('index'))
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
 
 class User(db.Model, UserMixin):
     idPrefix = 'USR'
@@ -146,6 +160,10 @@ def register():
         if password != confirm:
             flash('Passwords do not match!', 'danger')
             return redirect(url_for('register'))
+        
+        if len(username) < 2 or len(password) <8:
+            flash('Username (2) atau Password (8) terlalu pendek!', 'danger')
+            return redirect(url_for('register'))
 
         existing_user = User.query.filter_by(username=username).first()
         if existing_user:
@@ -174,6 +192,8 @@ def index():
         return redirect(url_for('login'))
     
     username = session['username']
+
+    print("Session role:", session.get('role'))
     return render_template("index.html", username=username)
 
 @app.route("/stok", methods=['POST', 'GET'])
@@ -191,6 +211,7 @@ def stok():
 
 @app.route("/tambah_bahan", methods=['POST', 'GET'])
 @login_required
+@role_required('Staf Pembelian')
 def tambahBahan():
     if request.method == 'POST':
         namaBahan = request.form.getlist('namaBahan')
@@ -232,6 +253,10 @@ def tambahBahan():
 def userSetting():
     user = User.query.get_or_404(current_user.id)
 
+    if current_user.id != user.id and current_user.role not in ['Owner', 'Manager']:
+        flash("You do not have permission to access this page.", "danger")
+        return redirect(url_for('home'))
+
     if request.method == 'POST':
         # Get updated values from form
         user.namaPanjang = request.form.get('namaPanjang')
@@ -259,6 +284,7 @@ def bahan():
 
 @app.route("/tambah_cabang", methods=['POST', 'GET'])
 @login_required
+@role_required('Owner')
 def tambahCabang():
     if request.method == 'POST':
         cabang = request.form['namaCabang']
@@ -293,12 +319,14 @@ def cabang():
 
 @app.route("/karyawan")
 @login_required
+@role_required('Owner', 'Manager')
 def karyawan():
     employees = User.query.order_by(User.id).all()
     return render_template('karyawan.html', employees=employees)
 
 @app.route("/delete_bahan/<string:id>")
 @login_required
+@role_required('Staf Pembelian')
 def deleteBahan(id):
     itemToDelete = Bahan.query.get_or_404(id)
 
@@ -310,8 +338,23 @@ def deleteBahan(id):
         print(e)
         return "There was a problem deleting data"
     
+@app.route("/delete_karyawan/<string:id>")
+@login_required
+@role_required('Owner', 'Manager')
+def deleteKaryawan(id):
+    userToDelete = User.query.get_or_404(id)
+
+    try:
+        db.session.delete(userToDelete)
+        db.session.commit()
+        return redirect("/karyawan")
+    except Exception as e:
+        print(e)
+        return "There was a problem deleting data"
+    
 @app.route("/delete_cabang/<string:id>")
 @login_required
+@role_required('Owner', 'Manager')
 def deleteCabang(id):
     chainToDelete = Cabang.query.get_or_404(id)
 
@@ -325,6 +368,7 @@ def deleteCabang(id):
     
 @app.route("/pengiriman", methods=['POST', 'GET'])
 @login_required
+@role_required('Kepala Gudang')
 def pengiriman():
     pusat_cabang_id = "CBG0001"
     bahans = Bahan.query.order_by(Bahan.id).all()
@@ -383,6 +427,7 @@ def pengiriman():
 
 @app.route("/order", methods=['POST', 'GET'])
 @login_required
+@role_required('Staf Pembelian')
 def order():
     bahans = Bahan.query.order_by(Bahan.id).all()
     pusat_cabang_id = "CBG0001" 
@@ -446,6 +491,7 @@ def order():
 
 @app.route("/update_stok/<idCabang>", methods=["POST", "GET"])
 @login_required
+@role_required('Kepala Gudang')
 def update_stok(idCabang):
     idBahan = request.args.get("idBahan")
     cabang = Cabang.query.get_or_404(idCabang)
@@ -483,6 +529,7 @@ def update_stok(idCabang):
 
 @app.route("/update_bahan/<string:id>", methods=['POST', 'GET'])
 @login_required
+@role_required('Staf Pembelian')
 def update_bahan(id):
     bahan = Bahan.query.get_or_404(id)
     if request.method == "POST":
@@ -495,6 +542,7 @@ def update_bahan(id):
 
 @app.route("/update_karyawan/<string:id>", methods=['POST', 'GET'])
 @login_required
+@role_required('Owner', 'Manager')
 def update_karyawan(id):
     user = User.query.get_or_404(id)
     if request.method == "POST":
@@ -528,10 +576,19 @@ def update_karyawan(id):
 @login_required
 def change_password(id):
     user = User.query.get_or_404(id)
+
+    if current_user.id != user.id and current_user.role not in ['Owner', 'Manager']:
+        flash("You do not have permission to access this page.", "danger")
+        return redirect(url_for('index'))
+
     if request.method == "POST":
         # Capture submitted data
         new_password = request.form["password"]
         confirm = request.form["confirm"]
+
+        if len(new_password) <8:
+            flash('Username (2) atau Password (8) terlalu pendek!', 'danger')
+            return redirect(url_for('change_password', id=id))
 
         # basic validation
         if new_password != confirm:
@@ -557,6 +614,7 @@ def change_password(id):
 
 @app.route("/update_cabang/<string:id>", methods=['POST', 'GET'])
 @login_required
+@role_required('Owner')
 def update_cabang(id):
     cabang = Cabang.query.get_or_404(id)
     if request.method == "POST":
@@ -567,6 +625,7 @@ def update_cabang(id):
 
 @app.route("/riwayatstok", methods=["GET"])
 @login_required
+@role_required('Owner', 'Manager', 'Kepala Gudang')
 def riwayat():
     records = Riwayat.query.order_by(Riwayat.tanggal.desc()).all()
     cabangs = {c.id: c.namaCabang for c in Cabang.query.all()}
@@ -575,6 +634,7 @@ def riwayat():
 
 @app.route("/riwayattransaksi", methods=["GET"])
 @login_required
+@role_required('Owner', 'Manager', 'Bendahara', 'Staf Pembelian')
 def riwayat_transaksi():
     records = RiwayatTransaksi.query.order_by(RiwayatTransaksi.tanggal.desc()).all()
     bahans = {b.id: b.namaBahan for b in Bahan.query.all()}
@@ -582,6 +642,7 @@ def riwayat_transaksi():
 
 @app.route("/riwayat/export_csv")
 @login_required
+@role_required('Owner', 'Manager', 'Kepala Gudang')
 def export_riwayat_csv():
     records = Riwayat.query.order_by(Riwayat.tanggal.desc()).all()
     cabangs = {c.id: c.namaCabang for c in Cabang.query.all()}
@@ -608,6 +669,7 @@ def export_riwayat_csv():
 
 @app.route("/riwayat_transaksi/export_csv")
 @login_required
+@role_required('Owner', 'Manager', 'Bendahara', 'Staf Pembelian')
 def export_riwayat_transaksi_csv():
     records = RiwayatTransaksi.query.order_by(RiwayatTransaksi.tanggal.desc()).all()
     bahans = {b.id: b.namaBahan for b in Bahan.query.all()}

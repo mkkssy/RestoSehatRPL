@@ -23,7 +23,12 @@
 
             <label for="alamat">Alamat:</label>
             <input type="text" name="alamat" id="alamat" class="form-control" {% if user.alamat == None%} value=""{% else %} value="{{ user.alamat }}" {% endif %} required>
-            <br><br>
+            
+            <br>
+
+            <a href='change_password/{{user.id}}'>Klik disini untuk ganti Password</a>
+
+            <br>
             <input type="submit" value="Update">
         </form>
 
