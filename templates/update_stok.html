@@ -14,7 +14,7 @@
             <label for="idBahan">Pilih Bahan:</label>
             <select name="idBahan" id="idBahan" required>
                 {% for bahan in bahans %}
-                <option value="{{ bahan.id }}">{{ bahan.namaBahan }}</option>
+                <option value="{{ bahan.id }}" {% if selected_bahan == bahan.id %}selected{% endif %}>{{ bahan.namaBahan }}</option>
                 {% endfor %}
             </select>
             <br><br>
@@ -29,7 +29,7 @@
             </select>
             <br><br>
 
-            <button type="submit" class="btn">Update Stok</button>
+            <input type="submit" value="Update Stok">
         </form>
 
         <h2 style="text-align:center;">Stok Saat Ini</h2>

@@ -35,9 +35,9 @@
                         <td>{{ item.hargaPerSatuan }}</td>
                         {% if current_user.role == 'Staf Pembelian' %}
                         <td>
-                            <a href="/delete_bahan/{{chain.id}}">Delete</a>
+                            <a href="/delete_bahan/{{item.id}}">Delete</a>
                             <br>
-                            <a href="/update_bahan/{{chain.id}}">Update</a>
+                            <a href="/update_bahan/{{item.id}}">Update</a>
                         </td>
                         {% endif %}
                     </tr>

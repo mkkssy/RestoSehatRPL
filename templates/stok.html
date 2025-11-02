@@ -53,7 +53,7 @@
                             {% if stock.idCabang == 'CBG0001' %}
                             <a href="/order">Update</a>
                             {% else %}
-                            <a href="/update_stok/{{stock.idCabang}}">Update</a>
+                            <a href="{{url_for('update_stok', idCabang = stock.idCabang, idBahan = stock.idBahan)}}">Update</a>
                             {% endif %}
                         </td>
                         {% endif %}

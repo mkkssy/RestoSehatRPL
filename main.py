@@ -19,10 +19,10 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(50), default='User')
-    namaPanjang = db.Column(db.String(200), unique=True)
+    namaPanjang = db.Column(db.String(200))
     email = db.Column(db.String(100), unique=True)
     noTelp = db.Column(db.String(12), unique=True)
-    alamat = db.Column(db.String(150), unique=True)
+    alamat = db.Column(db.String(150))
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -244,7 +244,8 @@ def userSetting():
             flash('User information successfully updated!', 'success')
         except Exception as e:
             db.session.rollback()
-            flash(f'An error occurred: {str(e)}', 'danger')
+            flash(f'An error occurred', 'danger')
+            print(str(e))
 
         return redirect(url_for('userSetting'))
 
@@ -443,9 +444,10 @@ def order():
 
     return render_template("order.html", bahans=bahans)
 
-@app.route("/update_stok/<string:idCabang>", methods=["POST", "GET"])
+@app.route("/update_stok/<idCabang>", methods=["POST", "GET"])
 @login_required
 def update_stok(idCabang):
+    idBahan = request.args.get("idBahan")
     cabang = Cabang.query.get_or_404(idCabang)
     stok_list = Stock.query.filter_by(idCabang=idCabang).all()
     bahans = Bahan.query.all()
@@ -458,6 +460,7 @@ def update_stok(idCabang):
         stok = Stock.query.filter_by(idCabang=idCabang, idBahan=idBahan).first()
         if not stok:
             return "Error: stok bahan tidak ditemukan."
+        
 
         if tipe == "keluar":
             if stok.jmlhBahan < jumlah_update:
@@ -476,7 +479,7 @@ def update_stok(idCabang):
 
             return redirect(url_for("stok"))
 
-    return render_template("update_stok.html", cabang=cabang, stok_list=stok_list, bahans=bahans)
+    return render_template("update_stok.html", cabang=cabang, stok_list=stok_list, bahans=bahans, selected_bahan=idBahan)
 
 @app.route("/update_bahan/<string:id>", methods=['POST', 'GET'])
 @login_required
@@ -539,7 +542,7 @@ def change_password(id):
             flash('New password cannot be the same as the old password!', 'danger')
             return redirect(url_for('change_password', id=id))
         
-        user.password_hash = generate_password_hash(new_password)
+        user.password_hash_hash = generate_password_hash(new_password)
         
         try:
             db.session.commit()
